@@ -64,7 +64,7 @@ public class Attractions extends HttpServlet {
     url += ",";
     url += longitude;
 
-    url += "&radius=10000&type=tourist_attraction&key=AIzaSyAalNVe9tRut2hxyNj0OT4VH8Ob8jaryIc";
+    url += "&radius=10000&type=tourist_attraction&key=" + API_KEY;
     String result = getRequest(url);
     response.setContentType("application/json");
     response.getWriter().println(result);
