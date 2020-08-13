@@ -1,1 +1,3 @@
 node_modules/
+src/main/java/com/google/gtravel/SecretKeys.java
+src/main/webapp/config.js
