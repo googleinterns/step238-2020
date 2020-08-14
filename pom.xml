@@ -59,7 +59,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>gtravel</deploy.projectId>
+          <deploy.projectId>google.com:gtravel-286013</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>

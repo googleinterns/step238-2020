@@ -29,10 +29,12 @@ import org.apache.http.util.EntityUtils;
 
 @WebServlet("/attractions")
 public class Attractions extends HttpServlet {
-  private String API_KEY = "";
+  SecretKeys secrets = new SecretKeys();
+
+  private String API_KEY = secrets.getGCP_API_KEY();
   private final CloseableHttpClient httpClient = HttpClients.createDefault();
 
-  private String getRequest(String url) throws IOException {
+  public String getRequest(String url) throws IOException {
     String output = "";
     HttpGet req = new HttpGet(url);
 
