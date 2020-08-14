@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
- 
-function App() {
+
+class App extends Component {
+componentDidMount() {
+    fetch("/attractions")
+      .then((response) => response.json())
+      .then((attractions) => {
+        setTimeout(function(){const list = document.getElementById("attractions_list");
+        const listDiv = document.createElement("div");
+        listDiv.className = "row";
+        listDiv.innerHTML = attractions;
+        list.appendChild(listDiv);
+        
+      });
+      }, 200);
+}
+
+render() {
   return (
     <div className="App">
  
@@ -37,7 +52,9 @@ function App() {
       </div>
     </div>
   </header>
- 
+ <section className="container" id = "atrractions_list">
+    
+ </section>
  
   <section className="features-icons bg-light text-center">
     <div className="container">
@@ -175,5 +192,6 @@ function App() {
     </div>
   );
 }
- 
+
+}
 export default App;

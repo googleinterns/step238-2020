@@ -37,15 +37,15 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-1.0-sdk</artifactId>
-      <version>1.9.59</version>
-    </dependency>
-    <dependency>
     <groupId>junit</groupId>   
         <artifactId>junit-dep</artifactId>
         <version>4.8.2</version>
         <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.2</version>
     </dependency>
   </dependencies>
 
@@ -59,7 +59,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>gtravel</deploy.projectId>
+          <deploy.projectId>google.com:gtravel-286013</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>
