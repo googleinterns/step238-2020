@@ -1,21 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Link from "react-router-dom";
 
 class App extends Component {
-componentDidMount() {
-    fetch("/attractions")
-      .then((response) => response.json())
-      .then((attractions) => {
-        setTimeout(function(){const list = document.getElementById("attractions_list");
-        const listDiv = document.createElement("div");
-        listDiv.className = "row";
-        listDiv.innerHTML = attractions;
-        list.appendChild(listDiv);
-        
-      });
-      }, 200);
-}
 
 render() {
   return (
@@ -41,10 +29,10 @@ render() {
           <form>
             <div className="form-row">
               <div className="col-12 col-md-9 mb-2 mb-md-0">
-                <input type="text" className="form-control form-control-lg" placeholder="Enter a destination..."/>
+                <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..."/>
               </div>
               <div className="col-12 col-md-3">
-                <button type="submit" className="btn btn-block btn-lg btn-primary">Search!</button>
+                <button type="submit" id="submit_button" className="btn btn-block btn-lg btn-primary">Search!</button>
               </div>
             </div>
           </form>
@@ -53,7 +41,7 @@ render() {
     </div>
   </header>
  <section className="container" id = "atrractions_list">
-    
+    <Link to="/map.html" className="btn btn-block btn-lg btn-primary">Get Itinerary</Link>
  </section>
  
   <section className="features-icons bg-light text-center">
