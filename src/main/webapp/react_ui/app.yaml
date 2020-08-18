@@ -1,5 +1,5 @@
 runtime: nodejs10
-service: default
+service: production
 
 resources:
  cpu: 1

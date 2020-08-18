@@ -1,4 +1,6 @@
+
 {
+  "Access-Control-Allow-Origin": "*",
   "short_name": "React App",
   "name": "Create React App Sample",
   "icons": [
@@ -18,7 +20,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "https://gtravel-286013.googleplex.com/manifest.json",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

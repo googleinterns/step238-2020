@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Link from "react-router-dom";
 
 class App extends Component {
 
@@ -41,7 +40,6 @@ render() {
     </div>
   </header>
  <section className="container" id = "atrractions_list">
-    <Link to="/map.html" className="btn btn-block btn-lg btn-primary">Get Itinerary</Link>
  </section>
  
   <section className="features-icons bg-light text-center">
