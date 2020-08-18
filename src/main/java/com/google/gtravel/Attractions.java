@@ -29,7 +29,6 @@ import org.apache.http.util.EntityUtils;
 
 @WebServlet("/attractions")
 public class Attractions extends HttpServlet {
-
   SecretKeys secrets = new SecretKeys();
 
   private String API_KEY = secrets.getGCP_API_KEY();

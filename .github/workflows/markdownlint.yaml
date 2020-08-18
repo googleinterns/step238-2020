@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 name: Markdown Presubmit
 
 on: [pull_request]
@@ -9,9 +12,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+<<<<<<< HEAD
       - name: Install npm packages
         run: npm install
       - name: Lint
         # Run Markdownlint on diffed MD files. Do not run if there are no diffs.
         run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(md)$" | xargs --no-run-if-empty npx markdownlint
+=======
+      - name: Install npm packages      - name: Lint
+        # Run Markdownlint on diffed MD files. Do not run if there are no diffs.
+        run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(md)$" | xargs --no-run-if-empty npx markdownlint
+        run: npm install
+>>>>>>> master
 

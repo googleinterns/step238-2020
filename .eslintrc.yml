@@ -3,6 +3,7 @@ env:
   commonjs: true
   es2020: true
 extends:
+<<<<<<< HEAD
   - 'plugin:react/recommended'
   - google
 parserOptions:
@@ -11,4 +12,9 @@ parserOptions:
   ecmaVersion: 11
 plugins:
   - react
+=======
+  - google
+parserOptions:
+  ecmaVersion: 11
+>>>>>>> master
 rules: {}

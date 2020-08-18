@@ -3,7 +3,10 @@ name: CSS Presubmit
 on: [pull_request]
 
 jobs:
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
   lint:
     runs-on: ubuntu-latest
 
@@ -14,4 +17,7 @@ jobs:
       - name: Lint
         # Run StyleLint on diffed CSS files. Do not run if there are no diffs.
         run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(css|htm|html)$" | xargs --no-run-if-empty npx stylelint
+<<<<<<< HEAD
 
+=======
+>>>>>>> master

@@ -1,18 +1,8 @@
 {
-  "name": "step238-2020",
+  "name": "gtravel",
   "version": "1.0.0",
-  "description": "Capstone project: GTravel",
+  "description": "",
   "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {
-    "eslint": "^6.6.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-plugin-react": "^7.20.6",
-    "htmllint-cli": "0.0.7",
-    "markdownlint": "^0.20.4",
-    "stylelint": "^13.6.1",
-    "stylelint-config-standard": "^20.0.0"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/googleinterns/step238-2020/issues"
   },
-  "homepage": "https://github.com/googleinterns/step238-2020#readme"
+  "homepage": "https://github.com/googleinterns/step238-2020#readme",
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-google": "^0.14.0",
+    "htmllint-cli": "0.0.7",
+    "markdownlint": "^0.20.4",
+    "stylelint": "^13.6.1",
+    "stylelint-config-standard": "^20.0.0"
+  }
 }

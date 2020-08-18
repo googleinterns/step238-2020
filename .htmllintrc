@@ -1,6 +1,9 @@
 {
     "plugins": [],  // npm modules to load
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     "maxerr": false,
     "raw-ignore-regex": false,
     "attr-bans": [
@@ -16,16 +19,26 @@
         "style",
         "width"
     ],
+<<<<<<< HEAD
     "indent-delta": false,
     "indent-style": "nonmixed",
     "indent-width": 4,
+=======
+    "indent-delta": true,
+    "indent-style": "nonmixed",
+    "indent-width": 2,
+>>>>>>> master
     "indent-width-cont": false,
     "spec-char-escape": true,
     "text-ignore-regex": false,
     "tag-bans": [
+<<<<<<< HEAD
         "style",
         "b",
         "i"
+=======
+        "style"
+>>>>>>> master
     ],
     "tag-close": true,
     "tag-name-lowercase": true,
@@ -44,7 +57,11 @@
     "attr-validate": true,
     "id-no-dup": true,
     "id-class-no-ad": true,
+<<<<<<< HEAD
     "id-class-style": "underscore",
+=======
+    "id-class-style": "dash",
+>>>>>>> master
     "class-no-dup": true,
     "class-style": false,
     "id-class-ignore-regex": false,
@@ -60,7 +77,11 @@
     "line-max-len": false,
     "line-max-len-ignore-regex": false,
     "head-req-title": true,
+<<<<<<< HEAD
     "title-no-dup": true,
+=======
+   "title-no-dup": true,
+>>>>>>> master
     "title-max-len": 60,
     "html-req-lang": false,
     "lang-style": "case",
@@ -71,4 +92,9 @@
     "table-req-caption": false,
     "table-req-header": false,
     "tag-req-attr": false
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> master
