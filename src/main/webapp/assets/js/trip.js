@@ -89,20 +89,6 @@ function parse_query_string(query) {
     const key = decodeURIComponent(pair[0]);
     const value = decodeURIComponent(pair[1]);
     query_string[key] = value;
-    // // If first entry with this name
-    // if (typeof query_string[key] === "undefined") {
-
-    //   query_string[key] = decodeURIComponent(value);
-    //   // If second entry with this name
-    // } else if (typeof query_string[key] === "string") {
-
-    //   const arr = [query_string[key], decodeURIComponent(value)];
-    //   query_string[key] = arr;
-    //   // If third or later entry with this name
-    // } else {
-
-    //   query_string[key].push(decodeURIComponent(value));
-    // }
   }
   return query_string;
 }
