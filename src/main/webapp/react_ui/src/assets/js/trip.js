@@ -100,6 +100,5 @@ function getFromUrl() {
 
   // Parsed Query
   const parsedQuery = parse_query_string(query);
-
   return parsedQuery;
 }
