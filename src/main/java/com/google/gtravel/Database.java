@@ -1,0 +1,91 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package com.google.sps;
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/database")
+
+public class Database extends HttpServlet {
+
+  // Get all trips that assigned to specific user.
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Make query by userID
+    String userID = request.getParameter("userID");
+    Query query = new Query("Trip");
+    query.addFilter("userID", Query.FilterOperator.EQUAL, userID);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+    ArrayList<String> trips = new ArrayList<String>();
+
+    // Iterate results and add each one to trips array.
+    for (Entity entity : results.asIterable()) {
+      userID = (String) entity.getProperty("userID");
+      String tripID = (String) entity.getProperty("tripID");
+      String tripName = (String) entity.getProperty("tripName");
+      long timestamp = (long) entity.getProperty("timestamp");
+
+      Trip newTrip = new Trip(userID, tripID, tripName, timestamp);
+      String tripJson = new Gson().toJson(newTrip);
+
+      trips.add(tripJson);
+    }
+    
+    // Send results to frontend.
+    response.setContentType("application/json");
+    String json = new Gson().toJson(trips);
+    response.getWriter().println(json);
+  }
+
+  // Add new trip.
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    // Take POST parameters to adding new entity.
+    String userID = request.getParameter("userID");
+    String tripID = request.getParameter("tripID");
+    String tripName = request.getParameter("tripName");
+    long timestamp = System.currentTimeMillis();
+
+    Entity tripEntity = new Entity("Trip");
+
+    // Set new entitys properties.
+    tripEntity.setProperty("userID", userID);
+    tripEntity.setProperty("tripID", tripID);
+    tripEntity.setProperty("tripName", tripName);
+    tripEntity.setProperty("timestamp", timestamp);
+
+    // Add entity.
+    datastore.put(tripEntity);
+    response.sendRedirect("/");
+  }
+}
