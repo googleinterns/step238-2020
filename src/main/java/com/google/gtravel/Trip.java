@@ -20,10 +20,10 @@ public class Trip {
   public String tripName;
   public long timestamp;
 
-  public Trip(String _userID, String _tripID, String _tripName, long _timestamp) {
-    userID = _userID;
-    tripID = _tripID;
-    tripName = _tripName;
-    timestamp = _timestamp;
+  public Trip(String userID, String tripID, String tripName, long timestamp) {
+    this.userID = userID;
+    this.tripID = tripID;
+    this.tripName = tripName;
+    this.timestamp = timestamp;
   }
 }
