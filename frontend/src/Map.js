@@ -101,10 +101,9 @@ class Map extends Component {
     componentDidMount() {
         if (!window.google) {
             const key = Object.values(ITINERARY_KEY)[0];
-            console.log(key);
             var s = document.createElement('script');
             s.type = 'text/javascript';
-            s.src = `https://maps.google.com/maps/api/js?key=AIzaSyDNZQ2ywFAOpSWjJS33BWKNfTtB4jSskAs`;
+            s.src = `https://maps.google.com/maps/api/js?key=`+key;
             document.head.appendChild(s);
             s.addEventListener('load', e => {
                 this.onScriptLoad()
@@ -127,4 +126,4 @@ class Map extends Component {
     }
 }
 
-export default Map
+export default Map;

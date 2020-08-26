@@ -2,7 +2,7 @@
 
 src/config.js
 src/configMap.js
-
+src/configImg.js
 # dependencies
 /node_modules
 /.pnp

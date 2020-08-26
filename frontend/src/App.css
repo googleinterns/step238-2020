@@ -36,3 +36,47 @@
     transform: rotate(360deg);
   }
 }
+
+.attraction img {
+            border-radius: 8px;
+        }
+        .attraction {
+            padding:8px;
+            border-radius: 8px;
+            border: 2px solid gray;
+            display: inline-block;
+
+
+        }
+        .attraction #name {
+            font-size: 25px;
+            font-weight: bold;
+            
+        }
+        .checked {
+            color:orange;
+        }
+        .unchecked {
+            color:gray;
+        }
+        #add-to-list {
+            background-color: #e7e7e7;
+            font-size: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+        #add-to-list:hover {
+            background-color: orange;
+            color: white;
+        }
+        #buttondiv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }

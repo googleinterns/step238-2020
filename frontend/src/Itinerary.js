@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import Map from './Map'
 
-class hope extends Component {
+class Itinerary extends Component {
     constructor() {
         super();
     }
@@ -30,4 +30,4 @@ class hope extends Component {
     }
 }
 
-export default hope;
+export default Itinerary;
