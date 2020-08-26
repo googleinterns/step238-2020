@@ -6,10 +6,6 @@ jobs:
   format:
     runs-on: ubuntu-latest
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 11
@@ -30,4 +26,3 @@ jobs:
           done
           exit $EXIT
         shell: bash
-
