@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> master
-name: HTML Presubmit
-
 on: [pull_request]
 
 jobs:
@@ -17,7 +11,3 @@ jobs:
       - name: Lint
         # Run HTMLLint on diffed HTML files. Do not run if there are no diffs.
         run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(htm|html)$" | xargs --no-run-if-empty npx htmllint
-<<<<<<< HEAD
-
-=======
->>>>>>> master
