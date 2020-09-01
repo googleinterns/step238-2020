@@ -1,3 +1,6 @@
+ 
+name: Markdown Presubmit
+
 on: [pull_request]
 
 jobs:
@@ -9,5 +12,5 @@ jobs:
       - name: Install npm packages
         run: npm install
       - name: Lint
-        # Run HTMLLint on diffed HTML files. Do not run if there are no diffs.
-        run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(htm|html)$" | xargs --no-run-if-empty npx htmllint
+        # Run Markdownlint on diffed MD files. Do not run if there are no diffs.
+        run: git diff --diff-filter=ACM --name-only origin/master HEAD -- . ':!node_modules' | grep -E "(.*)\.(md)$" | xargs --no-run-if-empty npx markdownlint
