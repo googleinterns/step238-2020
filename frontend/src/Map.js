@@ -9,9 +9,6 @@ class Map extends Component {
         super(props);
         this.onScriptLoad = this.onScriptLoad.bind(this)
     }
-    async weatherForecast(location) {
-
-    }
     onScriptLoad() {
         const map = new window.google.maps.Map(
         document.getElementById(this.props.id),
