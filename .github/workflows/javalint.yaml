@@ -26,4 +26,3 @@ jobs:
           done
           exit $EXIT
         shell: bash
-

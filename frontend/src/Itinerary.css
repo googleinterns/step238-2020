@@ -1,0 +1,58 @@
+#left-panel select,
+#left-panel input {
+  font-size: 15px;
+}
+
+#left-panel select {
+  width: 100%;
+}
+
+#left-panel i {
+  font-size: 12px;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  height: 100%;
+  float: left;
+  width: 70%;
+  visibility: visible;
+  border: thin solid black;
+}
+
+#left-panel {
+  line-height: 30px;
+  padding-left: 10px;
+  margin: 20px;
+  border-width: 2px;
+  width: 20%;
+  height: 400px;
+  float: left;
+  text-align: left;
+  padding-top: 0;
+}
+
+#directions-panel {
+  margin-top: 33px;
+  background-color: cadetblue;
+  padding: 10px;
+  overflow: scroll;
+  height: 800px;
+  color: aliceblue;
+}
+
+#title{
+    color: aliceblue;
+    background-color: cadetblue;
+}
+
+#weather {
+    color: white;
+    font-weight: bold;
+}
