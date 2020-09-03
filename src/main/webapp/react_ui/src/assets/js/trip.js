@@ -3,6 +3,7 @@
 
 /** Initialize the Map View */
 function initMap() {
+  // The input coordinates separated by asterisk (*), also for each coordinates latitude and longitude is seperated by comma (,).
   // Example: trip.html?locations=48.13237830000001,11.5865944*48.14127879999999,11.5652331*48.1472299,11.5737519*48.1376098,11.5799253*48.17315919999999,11.5466036*48.13237830000001,11.5865944
   const urlParameters = getFromUrl();
   // Select the center of map using first destination.
@@ -98,7 +99,6 @@ function getFromUrl() {
   // URL query after the question mark.
   const query = window.location.search.substring(1);
 
-  // Parsed Query
   const parsedQuery = parse_query_string(query);
   return parsedQuery;
 }

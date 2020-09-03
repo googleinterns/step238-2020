@@ -63,7 +63,6 @@ class Map extends Component {
             });
         }
 
-        // Check if date is defined
         if (urlParameters.date != undefined) {
             const datetime = urlParameters.date;
             const lat = start.split(',')[0];

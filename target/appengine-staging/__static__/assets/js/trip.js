@@ -95,10 +95,8 @@ function parse_query_string(query) {
 
 /** Look url and get locations for itinerary*/
 function getFromUrl() {
-  // URL query after the question mark.
   const query = window.location.search.substring(1);
 
-  // Parsed Query
   const parsedQuery = parse_query_string(query);
 
   return parsedQuery;
