@@ -2,19 +2,27 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import ITINERARY_KEY from "./configMap";
 import './Itinerary.css';
+import Button from "react-bootstrap/Button";
 
 class Map extends Component {
+    
     constructor(props) {
         super(props);
-        this.onScriptLoad = this.onScriptLoad.bind(this)
+        this.onScriptLoad = this.onScriptLoad.bind(this);
+        this.getSavedItinerary = this.getSavedItinerary.bind(this);
+        this.deleteItinerary = this.deleteItinerary.bind(this);
+        this.saveUserItinerary = this.saveUserItinerary.bind(this);
+        this.callLoad = this.callLoad.bind(this);
     }
 
     onScriptLoad() {
-        const map = new window.google.maps.Map(
-        document.getElementById(this.props.id),
-        this.props.options);
 
-        let query = window.location.search.substring(1);
+        const map = new window.google.maps.Map(
+            document.getElementById(this.props.id),
+            this.props.options);
+
+        //let query = window.location.search.substring(1);
+        let query = localStorage["url"];
         let vars = query.split("&");
         let query_string = {};
 
@@ -26,18 +34,19 @@ class Map extends Component {
             query_string[key] = value;
         }
         let urlParameters = query_string;
-        const centerPoint = urlParameters.locations.split('*')[0];
+        //const centerPoint = urlParameters.locations.split('*')[0];
 
-        const centerLat = parseFloat(centerPoint.split(',')[0]);
-        const centerLong = parseFloat(centerPoint.split(',')[1]);
+        //const centerLat = parseFloat(centerPoint.split(',')[0]);
+        //const centerLong = parseFloat(centerPoint.split(',')[1]);
 
         const directionsService = new window.google.maps.DirectionsService();
         const directionsRenderer = new window.google.maps.DirectionsRenderer();
         directionsRenderer.setMap(map);
-        
+
         let waypts = [];
-        query = window.location.search.substring(1);
+        query = localStorage["url"];
         vars = query.split("&");
+        console.log(vars);
         query_string = {};
 
         for (var i = 0; i < vars.length; i++) {
@@ -103,14 +112,91 @@ class Map extends Component {
             const key = Object.values(ITINERARY_KEY)[0];
             var s = document.createElement('script');
             s.type = 'text/javascript';
-            s.src = `https://maps.google.com/maps/api/js?key=`+key;
+            s.src = `https://maps.google.com/maps/api/js?key=` + key;
             document.head.appendChild(s);
             s.addEventListener('load', e => {
                 this.onScriptLoad()
             })
         } else {
-            this.onScriptLoad()
+            this.onScriptLoad();
         }
+    }
+
+    saveUserItinerary() {
+        const params = new URLSearchParams();
+        params.append('userID', localStorage["id"]);
+        params.append('tripID', localStorage["url"]);
+        params.append('tripName', localStorage["searchValue"]);
+        fetch('/api/database', {
+            method: 'POST',
+            body: params
+        });
+        alert("Congrats! You just saved your itinerary!");
+    }
+   
+    getSavedItinerary() {
+        fetch(`/api/database?userID=${localStorage["id"]}`, {
+            method: 'GET'
+        }).then((response) => response.json())
+            .then((trips) => {
+                let index = 0;
+
+                if (localStorage["index"] === undefined)
+                    localStorage.setItem("index", trips.length - 1);
+                //we show the last trip
+                index = localStorage["index"];
+                localStorage.setItem("url", trips[index].tripID);
+
+                // we get the buttons location
+                let buttonLocation = document.getElementById("test");
+                // delete all the previous buttons
+                buttonLocation.innerHTML = "";
+                //we create the buttons
+                for (let i = 0; i < trips.length; i++) {
+                    const button = document.createElement("button");
+                    button.id = trips[i].tripID;
+                    button.innerText = trips[i].tripName;
+                    let currentUrl = trips[i].tripID === undefined ? 'locations=': trips[i].tripID;
+                    button.addEventListener("click", 
+                        this.callLoad(currentUrl)
+                    );
+                    if(button.innerText === undefined)
+                         buttonLocation.appendChild(button);
+                }
+                //we add the delete button
+                const button = document.createElement("button");
+                button.innerText = "remove trip";
+                button.addEventListener("click", function() {
+                    //we first delete the button with the url
+                    document.getElementById(localStorage["url"]).remove();
+                    //then we delete it from the database 
+                    const params = new URLSearchParams();
+                    params.append('tripID', localStorage["url"]);
+                    fetch(
+                        'api/delete', {
+                        method: 'post',
+                        body: params
+                    }
+                    )
+                });
+                buttonLocation.appendChild(button);
+
+            });
+
+    }
+    callLoad(currentUrl) {
+        localStorage.setItem("url", currentUrl);
+        this.onScriptLoad();
+    }
+    deleteItinerary() {
+        const params = new URLSearchParams();
+        params.append('tripID', localStorage["url"]);
+        fetch(
+            'api/delete', {
+            method: 'post',
+            body: params
+        }
+        )
     }
 
     render() {
@@ -118,9 +204,13 @@ class Map extends Component {
             <div>
                 <div id="left-panel">
                     <div id="directions-panel"></div>
+                    <div id="test"></div>
                 </div>
                 <h1 id="title">My Itinerary</h1>
-                <div style={{ width: 1000, height: 800, float: 'left', position: 'absolute', right: 60 }} id={this.props.id}></div>
+                <Button id='save' onClick={this.saveUserItinerary}>Save this itinerary</Button>
+                <Button id='prev' onClick={this.getSavedItinerary}>Previous trips</Button>
+                <Button id='delete' onClick={this.deleteItinerary}>Delete all trips</Button>
+                <div style={{ width: 1000, height: 800, float: 'left', position: 'absolute', left: '35%' }} id={this.props.id}></div>
             </div>
         );
     }

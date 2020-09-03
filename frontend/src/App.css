@@ -37,16 +37,14 @@
   }
 }
 
-.attraction img {
+#attraction img {
             border-radius: 8px;
         }
-        .attraction {
+        #attraction {
             padding:8px;
             border-radius: 8px;
             border: 2px solid gray;
             display: inline-block;
-
-
         }
         .attraction #name {
             font-size: 25px;
@@ -80,3 +78,20 @@
             justify-content: center;
             align-items: center;
         }
+.logo { 
+         background: url("./assets/img/logo.jpg") no-repeat; 
+         width: 100px; 
+         height: 100px; 
+         display: block; 
+         visibility:  visible;
+         border-radius: 50%;
+         
+}
+.img {
+    width: 100px; 
+    height: 100px;
+}
+
+.img-thumbnail {
+  background: url("./assets/img/logo.jpg") no-repeat; 
+}
