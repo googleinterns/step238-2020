@@ -15,13 +15,13 @@ import javax.servlet.ServletException;
 @WebServlet("/api/delete")
 public class DeleteServlet extends HttpServlet {
    
-  @Override
-  protected void service(HttpServletRequest request, HttpServletResponse   response) throws ServletException, IOException {
-        doPost(request, response);
-}
+  //@Override
+  //protected void service(HttpServletRequest request, HttpServletResponse   response) throws ServletException, IOException {
+   //     doPost(request, response);
+//}
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String id = request.getParameter("userID");
+    String id = request.getParameter("tripID");
 
     Key tripEntityKey = KeyFactory.createKey("Trip", id);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

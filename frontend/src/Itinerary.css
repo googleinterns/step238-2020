@@ -51,3 +51,16 @@ body {
     color: aliceblue;
     background-color: cadetblue;
 }
+
+.mapbtn {
+    display: -ms-inline-flexbox;
+}
+
+#saved {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px;
+    justify-content: center;
+    align-content: center;
+    margin-left: 100px;
+}

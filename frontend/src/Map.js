@@ -5,7 +5,7 @@ import './Itinerary.css';
 import Button from "react-bootstrap/Button";
 
 class Map extends Component {
-    
+
     constructor(props) {
         super(props);
         this.onScriptLoad = this.onScriptLoad.bind(this);
@@ -13,10 +13,10 @@ class Map extends Component {
         this.deleteItinerary = this.deleteItinerary.bind(this);
         this.saveUserItinerary = this.saveUserItinerary.bind(this);
         this.callLoad = this.callLoad.bind(this);
+        this.m_get_directions_route = this.m_get_directions_route.bind(this);
     }
 
     onScriptLoad() {
-
         const map = new window.google.maps.Map(
             document.getElementById(this.props.id),
             this.props.options);
@@ -27,12 +27,12 @@ class Map extends Component {
         let query_string = {};
 
         for (var i = 0; i < vars.length; i++) {
-
             const pair = vars[i].split("=");
             const key = decodeURIComponent(pair[0]);
             const value = decodeURIComponent(pair[1]);
             query_string[key] = value;
         }
+
         let urlParameters = query_string;
         //const centerPoint = urlParameters.locations.split('*')[0];
 
@@ -46,7 +46,7 @@ class Map extends Component {
         let waypts = [];
         query = localStorage["url"];
         vars = query.split("&");
-        console.log(vars);
+
         query_string = {};
 
         for (var i = 0; i < vars.length; i++) {
@@ -55,11 +55,10 @@ class Map extends Component {
             const key = decodeURIComponent(pair[0]);
             const value = decodeURIComponent(pair[1]);
             query_string[key] = value;
-
         }
+
         urlParameters = query_string;
         const locations = urlParameters.locations.split('*');
-
 
         const start = locations[0];
         const finish = locations[locations.length - 1];
@@ -71,15 +70,23 @@ class Map extends Component {
             });
         }
 
+        let delayFactor = 0;
+        let request = {
+            origin: start,
+            destination: finish,
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: window.google.maps.TravelMode.DRIVING
+        };
 
+        this.m_get_directions_route(delayFactor, request, directionsRenderer, directionsService);
+
+        this.props.onMapLoad(map)
+    }
+
+    m_get_directions_route(delayFactor, request, directionsRenderer, directionsService) {
         directionsService.route(
-            {
-                origin: start,
-                destination: finish,
-                waypoints: waypts,
-                optimizeWaypoints: true,
-                travelMode: window.google.maps.TravelMode.DRIVING,
-            },
+            request,
             (response, status) => {
                 if (status === 'OK') {
                     directionsRenderer.setDirections(response);
@@ -89,6 +96,12 @@ class Map extends Component {
                     summaryPanel.innerHTML = '';
 
                     for (let i = 0; i < route.legs.length; i++) {
+                        let infoWindow = new window.google.maps.InfoWindow();
+
+                        infoWindow.setContent(route.legs[i].start_address);
+
+                        // infoWindow.open(map);
+
                         const routeSegment = i + 1;
                         summaryPanel.innerHTML +=
                             '<b>Route Segment: ' + routeSegment + '</b><br>';
@@ -97,15 +110,17 @@ class Map extends Component {
                         summaryPanel.innerHTML +=
                             route.legs[i].distance.text + '<br><br>';
                     }
+                } else if (status === window.google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                    delayFactor++;
+                    setTimeout(function() {
+                        this.m_get_directions_route();
+                    }, delayFactor * 1000);
                 } else {
                     window.alert('Directions request failed due to ' + status);
                 }
             },
-        );
-
-
-        this.props.onMapLoad(map)
-    }
+        )
+    };
 
     componentDidMount() {
         if (!window.google) {
@@ -131,9 +146,10 @@ class Map extends Component {
             method: 'POST',
             body: params
         });
-        alert("Congrats! You just saved your itinerary!");
+        document.getElementById("save").innerText = "Trip " + localStorage["searchValue"] + " was saved";
+        document.getElementById("save").style.backgroundColor = "green";
     }
-   
+
     getSavedItinerary() {
         fetch(`/api/database?userID=${localStorage["id"]}`, {
             method: 'GET'
@@ -143,25 +159,26 @@ class Map extends Component {
 
                 if (localStorage["index"] === undefined)
                     localStorage.setItem("index", trips.length - 1);
-                //we show the last trip
-                index = localStorage["index"];
-                localStorage.setItem("url", trips[index].tripID);
+
 
                 // we get the buttons location
-                let buttonLocation = document.getElementById("test");
+                let buttonLocation = document.getElementById("saved");
                 // delete all the previous buttons
-                buttonLocation.innerHTML = "";
+                buttonLocation.innerHTML = "<h4>Previous created trips</h4>";
                 //we create the buttons
                 for (let i = 0; i < trips.length; i++) {
                     const button = document.createElement("button");
-                    button.id = trips[i].tripID;
                     button.innerText = trips[i].tripName;
-                    let currentUrl = trips[i].tripID === undefined ? 'locations=': trips[i].tripID;
-                    button.addEventListener("click", 
+                    button.style.backgroundColor = "cadetblue";
+                    button.style.color = "aliceblue";
+                    let currentUrl = trips[i].tripID === undefined ? 'locations=' : trips[i].tripID;
+                    button.id = currentUrl;
+                    button.addEventListener("click", e => {
                         this.callLoad(currentUrl)
-                    );
-                    if(button.innerText === undefined)
-                         buttonLocation.appendChild(button);
+                    })
+
+
+                    buttonLocation.appendChild(button);
                 }
                 //we add the delete button
                 const button = document.createElement("button");
@@ -180,14 +197,13 @@ class Map extends Component {
                     )
                 });
                 buttonLocation.appendChild(button);
-
             });
-
     }
     callLoad(currentUrl) {
         localStorage.setItem("url", currentUrl);
         this.onScriptLoad();
     }
+
     deleteItinerary() {
         const params = new URLSearchParams();
         params.append('tripID', localStorage["url"]);
@@ -202,14 +218,19 @@ class Map extends Component {
     render() {
         return (
             <div>
+
                 <div id="left-panel">
                     <div id="directions-panel"></div>
-                    <div id="test"></div>
+                    <br />
+                    <br />
+                    <br />
+                    <div id="saved"></div>
                 </div>
                 <h1 id="title">My Itinerary</h1>
-                <Button id='save' onClick={this.saveUserItinerary}>Save this itinerary</Button>
-                <Button id='prev' onClick={this.getSavedItinerary}>Previous trips</Button>
-                <Button id='delete' onClick={this.deleteItinerary}>Delete all trips</Button>
+                <div class="mapbtn">
+                    <Button id='save' onClick={this.saveUserItinerary}>Save this itinerary</Button>
+                    <Button id='prev' onClick={this.getSavedItinerary} href="#saved">Previous trips</Button>
+                </div>
                 <div style={{ width: 1000, height: 800, float: 'left', position: 'absolute', left: '35%' }} id={this.props.id}></div>
             </div>
         );
