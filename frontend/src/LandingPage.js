@@ -18,6 +18,71 @@ let lat1, lat2, long1, long2, url;
 
 function LandingPage() {
 
+    let google, map, markers = [];
+    function initMap() {
+        google = window.google;
+
+        const cityLocation = {
+            lat: 48.1351,
+            lng: 11.5820
+        };
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 11,
+            center: cityLocation
+        });
+    }
+    function removeMarker(location) {
+        // Convert string location to JSON object.
+        const position = {
+            lat: parseFloat(location.split(',')[0]),
+            lng: parseFloat(location.split(',')[1]),
+        };
+
+        // Before updating markers clear all markers.
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].markerObject.setMap(null);
+        }
+
+        // Find the specific marker and remove from the array.
+        for (let i = 0; i < markers.length; i++) {
+            if (markers[i].position.lat == position.lat &&
+                markers[i].position.lng == position.lng) {
+                markers.splice(i, 1);
+                break;
+            }
+        }
+
+        // Update the markers on map page.
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].markerObject.setMap(map);
+        }
+    }
+    function addMarker(location) {
+        // Convert string location to JSON object.   
+        const position = {
+            lat: parseFloat(location.split(',')[0]),
+            lng: parseFloat(location.split(',')[1]),
+        };
+        map.setCenter(position);
+
+        const markerObject = new google.maps.Marker({
+            position: position,
+        });
+
+        const marker = {
+            position: position,
+            markerObject: markerObject,
+        }
+
+        // Add new marker to the array.
+        markers.push(marker);
+
+        // Update markers on map page.
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].markerObject.setMap(map);
+        }
+    }
+
     const [hiddenIn, setHiddenIn] = useState(false);
     const [hiddenOut, setHiddenOut] = useState(true);
 
@@ -49,6 +114,7 @@ function LandingPage() {
     function calls() {
         handleScriptLoad1(setQuery1);
         handleScriptLoad2(setQuery2);
+        initMap();
     }
 
     const loadScript = (url) => {
@@ -60,6 +126,7 @@ function LandingPage() {
                 if (script.readyState === "loaded" || script.readyState === "complete") {
                     script.onreadystatechange = null;
                     calls();
+
                 }
             };
         } else {
@@ -69,6 +136,7 @@ function LandingPage() {
         script.src = url;
         document.getElementsByTagName("head")[0].appendChild(script);
     };
+
     function handleScriptLoad1(updateQuery) {
         autoComplete1 = new window.google.maps.places.Autocomplete(
             document.getElementById("startplace"),
@@ -128,29 +196,209 @@ function LandingPage() {
             `https://maps.googleapis.com/maps/api/js?key=` + Object.values(ITINERARY_KEY)[0] + `&libraries=places`
         );
         authentication();
+        // if (!window.google) {
+        //     const key = Object.values(ITINERARY_KEY)[0];
+        //     var s = document.createElement('script');
+        //     s.type = 'text/javascript';
+        //     s.src = 'https://maps.googleapis.com/maps/api/js?key=' + key;
+        //     s.src += '&libraries=&v=weekly';
+        //     document.head.appendChild(s);
+        //     s.addEventListener('load', e => {
+        //         initMap();
+        //     })
+        // } else {
+        //     initMap();
+        // }
+
     }, []);
+
+    function revertCity() {
+        searchValue = localStorage["backupSearchValue"];
+
+        searchValue.replace(/\s/g, '+');
+        const key = Object.values(SECRET_KEY)[0];
+        const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + searchValue +
+            '&key=' + key;
+        fetch(url)
+            .then(response => response.json())
+            .then(function(data) {
+                const lat = data.results[0].geometry.location.lat;
+                const lng = data.results[0].geometry.location.lng;
+                const adress = '/api/attractions?lat=' + lat + '&long=' + lng;
+                fetch(adress)
+                    .then(response => response.json())
+                    .then(function(attractions) {
+                        setTimeout(function() {
+                            const listatt = document.getElementById('attractionDiv');
+                            const listDiv = document.createElement('div');
+                            listDiv.className = 'row';
+                            listDiv.innerHTML = '';
+                            attractions.results.sort((a, b) => {
+                                return b.user_ratings_total - a.user_ratings_total;
+                            });
+                            for (let i = 0; i < attractions.results.length; i++) {
+                                listDiv.appendChild(createListElem(attractions.results[i]));
+                            }
+                            localStorage.removeItem("url");
+                            listatt.innerHTML = '';
+                            listatt.appendChild(listDiv);
+                        }
+                            , 200);
+                    }
+                    );
+            })
+
+    }
+
+    function createRestaurantElem(attraction) {
+        const liElement = document.createElement("li");
+        liElement.id = 'attraction';
+        let touristsview = '';
+       
+        const keyImg = Object.values(ImgKey)[0];
+      
+        touristsview += '<img width="300" height="200" src=' + 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
+            '<br>' +
+            '<strong id="rating">' + attraction.rating + '</strong>' +
+            '<span id="total_rating">' + '(' + attraction.user_ratings_total + ')' + '</span>' +
+            '<br>' +
+            '<span id="name">' + attraction.name + '</span>' +
+            '<br>';
+
+        liElement.innerHTML = touristsview;
+
+        const buttonAdd = document.createElement('button');
+        buttonAdd.id = 'add-to-list';
+
+        if (localStorage["url"] !== undefined) {
+            const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+            if (localStorage["url"].includes(location)){
+                buttonAdd.innerText = "REMOVE";
+                
+            }
+            else{  
+                buttonAdd.innerText = 'ADD';
+                
+              }
+        }
+        else
+            buttonAdd.innerText = 'ADD';
+
+        buttonAdd.addEventListener('click', () => {
+            if (buttonAdd.innerText == "ADD") {
+                let url = localStorage["url"];
+                //it should be something like locations=
+                if (url === undefined) {
+                    url = 'locations=';
+
+                }
+                else
+                    url += "*";
+                const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                url += location;
+                addMarker(location);
+
+                localStorage.setItem("url", url);
+                buttonAdd.innerText = "REMOVE";
+                liElement.style.backgroundColor = 'green';
+            }
+            else {
+                const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                removeMarker(location);
+
+                let url = localStorage["url"];
+                let toDelete = '*' + location;
+
+                url = url.replace(toDelete, "");//to delete the location if it's like *location;
+                toDelete = toString(attraction.geometry.lng + "," + attraction.geometry.lat);
+                url = url.replace(toDelete, ""); //to delete the location if it's the single location, or if it's the first one
+
+                localStorage.setItem("url", url);
+
+                buttonAdd.innerText = "ADD";
+                liElement.style.backgroundColor = "white";
+
+            }
+        });
+        liElement.appendChild(buttonAdd);
+        return liElement;
+    }
+
+
+
 
     function createListElem(attraction) {
         const liElement = document.createElement("li");
         liElement.id = 'attraction';
         let touristsview = '';
-        let open;
+      
         const keyImg = Object.values(ImgKey)[0];
-        if (attraction.opening_hours === undefined) { open = "info not available"; }
-        else { open = attraction.opening_hours.open_now; }
+        
         touristsview += '<img width="300" height="200" src=' + 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
             '<br>' +
             '<strong id="rating">' + attraction.rating + '</strong>' +
             '<span id="total_rating">' + '(' + attraction.user_ratings_total + ')' + '</span>' +
             '<br>' +
             '<strong id="name">' + attraction.name + '</strong>' +
-            '<br>' +
-            '<span id="timetable">' + 'Opened: ' + open + '</span>';
+            '<br>';
 
         liElement.innerHTML = touristsview;
+
+        //this is only for attractions 
+        const buttonRestaurants = document.createElement("button");
+        buttonRestaurants.id = 'display-restaurants';
+        buttonRestaurants.innerText = 'Restaurants';
+        buttonRestaurants.addEventListener("click", () => {
+            const lat = attraction.geometry.location.lat;
+            const lng = attraction.geometry.location.lng;
+
+            //const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + searchValue +
+               // '&radius=150000&type=restaurant&key=' + keyImg;
+            //console.log(url);
+            const adress = "api/restaurants?lat=" + lat + "&long=" + lng;
+            fetch(adress)
+                .then(response => response.json())
+                .then(function(data) {
+                    console.log(data);
+                    const listatt = document.getElementById('attractionDiv');
+                    const listDiv = document.createElement('div');
+                    listDiv.className = 'row';
+                    listDiv.innerHTML = '';
+
+                    data.results.sort((a, b) => {
+                                return b.user_ratings_total - a.user_ratings_total;
+                            }); 
+
+                    for (let i = 0; i < data.results.length; i++) {
+                        listDiv.appendChild(createRestaurantElem(data.results[i]));
+                    }
+
+                    const removeButton = document.createElement("button");
+                    removeButton.innerText = "Back";
+                    removeButton.addEventListener("click", () => {
+                        revertCity();
+                    })
+                    
+                    listatt.innerHTML = '';
+                    listatt.appendChild(listDiv);
+                    listatt.appendChild(removeButton);
+                })
+
+        })
+
         const buttonAdd = document.createElement('button');
         buttonAdd.id = 'add-to-list';
-        buttonAdd.innerText = 'ADD';
+        if (localStorage["url"] !== undefined) {
+            const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+            if (localStorage["url"].includes(location))
+                buttonAdd.innerText = "REMOVE";
+            else
+                buttonAdd.innerText = 'ADD';
+
+        }
+        else
+            buttonAdd.innerText = 'ADD';
+
         buttonAdd.addEventListener('click', () => {
             if (buttonAdd.innerText == "ADD") {
                 liElement.style.backgroundColor = 'green';
@@ -162,25 +410,33 @@ function LandingPage() {
                 }
                 else
                     url += "*";
-                url += attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                url += location;
+                addMarker(location);
                 localStorage.setItem("url", url);
                 buttonAdd.innerText = "REMOVE";
             }
             else {
-                url = localStorage["url"];
-                let toDelete = '*' + attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
+                removeMarker(location);
 
-                url.replace(toDelete, "");//to delete the location if it's like *location;
+                let url = localStorage["url"];
+                let toDelete = '*' + location;
+
+                url = url.replace(toDelete, "");//to delete the location if it's like *location;
                 toDelete = toString(attraction.geometry.lng + "," + attraction.geometry.lat);
-                url.replace(toDelete, ""); //to delete the location if it's the single location, or if it's the first one
+                url = url.replace(toDelete, ""); //to delete the location if it's the single location, or if it's the first one
 
                 localStorage.setItem("url", url);
 
                 buttonAdd.innerText = "ADD";
-                liElement.style.backgroundColor = 'red';
+                liElement.style.backgroundColor = "white";
+
+                
             }
         });
         liElement.appendChild(buttonAdd);
+        liElement.appendChild(buttonRestaurants);
         return liElement;
     }
 
@@ -188,8 +444,11 @@ function LandingPage() {
     function submitcity() {
         searchValue = document.getElementById('searchbox').value;
         localStorage.setItem("searchValue", searchValue);
+        markers = [];
+        //this is for getting the list back after using restaurants;
+        localStorage.setItem("backupSearchValue", searchValue);
         searchValue.replace(/\s/g, '+');
-        const key = Object.values(SECRET_KEY)[0];
+        const key = Object.values(ITINERARY_KEY)[0];
         const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + searchValue +
             '&key=' + key;
         fetch(url)
@@ -226,8 +485,6 @@ function LandingPage() {
 
     }
 
-
-
     function getSavedItinerary() {
         fetch(`/api/database?userID=${localStorage["id"]}`, {
             method: 'GET'
@@ -241,7 +498,7 @@ function LandingPage() {
                 // we get the buttons location
                 let buttonLocation = document.getElementById("saved");
                 // delete all the previous buttons
-                buttonLocation.innerHTML = "<p>Previous created trips</p>";
+                buttonLocation.innerHTML = "<p>Previous created trips</p>" + "<br/>" + "<br/>";
                 //we create the buttons
                 for (let i = 0; i < trips.length; i++) {
                     const button = document.createElement("button");
@@ -249,36 +506,45 @@ function LandingPage() {
                     button.style.backgroundColor = "cadetblue";
                     button.style.color = "aliceblue";
                     let currentUrl = trips[i].tripID === undefined ? 'locations=' : trips[i].tripID;
-                    button.id = currentUrl;
+                    button.id = trips[i].id;
                     button.addEventListener("click", e => {
                         callLoad(currentUrl)
                     })
                     buttonLocation.appendChild(button);
+
+                    //we add the delete button
+                    const buttondel = document.createElement("button");
+                    buttondel.innerText = "remove trip";
+                    buttondel.id = trips[i].timestamp;
+                    buttondel.addEventListener("click", function() {
+                        //we first delete the button with the url
+                        const params = new URLSearchParams();
+                        params.append("id", trips[i].id);
+                        fetch(
+                            'api/delete', {
+                            method: 'post',
+                            body: params
+                        })
+
+                        document.getElementById(trips[i].id).remove();
+                        document.getElementById(trips[i].timestamp).remove();
+                        //then we delete it from the database 
+
+                    });
+                    buttonLocation.appendChild(buttondel);
                 }
-                //we add the delete button
-                const button = document.createElement("button");
-                button.innerText = "remove trip";
-                button.addEventListener("click", function() {
-                    //we first delete the button with the url
-                    document.getElementById(localStorage["url"]).remove();
-                    //then we delete it from the database 
-                    const params = new URLSearchParams();
-                    params.append('tripID', localStorage["url"]);
-                    fetch(
-                        'api/delete', {
-                        method: 'post',
-                        body: params
-                    }
-                    )
-                });
-                buttonLocation.appendChild(button);
-            });
+            })
     }
     function callLoad(currentUrl) {
         localStorage.setItem("url", currentUrl);
         window.location.href = "/map";
     }
 
+    function handleKeyPress(event) {
+        if(event.key === 'Enter'){
+            submitcity();
+        }
+    }
 
     return (
         <div>
@@ -306,7 +572,7 @@ function LandingPage() {
                         <div className="col-md-10 col-lg-8 col-xl-7 mx-auto">
                             <div className="form-row">
                                 <div className="col-12 col-md-9 mb-2 mb-md-0">
-                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..." />
+                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..."  onKeyPress={handleKeyPress}/>
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <button type="submit" id="submit_button" className="btn btn-block btn-lg btn-primary" onClick={submitcity}>Search!</button>
@@ -319,14 +585,18 @@ function LandingPage() {
                 </div>
             </header>
 
-            <section className="container">
+            <section >
                 <p>Create a brand new itinerary by selecting what attractions you would like to visit, after searching the desired city</p>
-                <div id="attractionDiv">
+                <div className="row">
+                    <div className="col-lg-8">
+                        <div id="attractionDiv">
 
+                        </div>
+                    </div>
+                    <div className="col-lg-4">
+                        <div style={{ maxWidth: 1000, maxHeight: 1000, float: 'right', right: 0 }} id="map"></div>
+                    </div>
                 </div>
-
-                <br />
-
                 <div className="optionalForm" id="optionalForm" style={{ display: 'none', align: 'centre' }}>
                     <input id="startplace"
 
@@ -354,8 +624,8 @@ function LandingPage() {
                     </Link>
                 </div>
             </section>
-
-            <section className="features-icons bg-light text-center">
+           
+            <section className="features-icons bg-light text-center" style={{ marginTop: '50px' }}>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-4">

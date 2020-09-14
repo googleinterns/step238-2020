@@ -10,7 +10,6 @@ class Map extends Component {
         super(props);
         this.onScriptLoad = this.onScriptLoad.bind(this);
         this.getSavedItinerary = this.getSavedItinerary.bind(this);
-        this.deleteItinerary = this.deleteItinerary.bind(this);
         this.saveUserItinerary = this.saveUserItinerary.bind(this);
         this.callLoad = this.callLoad.bind(this);
         this.m_get_directions_route = this.m_get_directions_route.bind(this);
@@ -95,11 +94,13 @@ class Map extends Component {
                     const summaryPanel = document.getElementById('directions-panel');
                     summaryPanel.innerHTML = '';
 
+                    let directionsData = response.routes[0].legs[0];
+                    document.getElementById('duration').innerHTML += " Driving distance is " + directionsData.distance.text + " (" + directionsData.duration.text + ").";
+
                     for (let i = 0; i < route.legs.length; i++) {
                         let infoWindow = new window.google.maps.InfoWindow();
 
                         infoWindow.setContent(route.legs[i].start_address);
-
                         // infoWindow.open(map);
 
                         const routeSegment = i + 1;
@@ -164,7 +165,7 @@ class Map extends Component {
                 // we get the buttons location
                 let buttonLocation = document.getElementById("saved");
                 // delete all the previous buttons
-                buttonLocation.innerHTML = "<h4>Previous created trips</h4>";
+                buttonLocation.innerHTML = "<h4>Previous created trips</h4>"+"<br/>"+"<br/>";
                 //we create the buttons
                 for (let i = 0; i < trips.length; i++) {
                     const button = document.createElement("button");
@@ -172,47 +173,39 @@ class Map extends Component {
                     button.style.backgroundColor = "cadetblue";
                     button.style.color = "aliceblue";
                     let currentUrl = trips[i].tripID === undefined ? 'locations=' : trips[i].tripID;
-                    button.id = currentUrl;
+                    button.id = trips[i].id;
                     button.addEventListener("click", e => {
                         this.callLoad(currentUrl)
                     })
 
-
                     buttonLocation.appendChild(button);
-                }
-                //we add the delete button
-                const button = document.createElement("button");
-                button.innerText = "remove trip";
-                button.addEventListener("click", function() {
+
+                 //we add the delete button
+                const buttondel = document.createElement("button");
+                buttondel.innerText = "remove trip";
+                buttondel.id = trips[i].timestamp;
+                buttondel.addEventListener("click", function() {
                     //we first delete the button with the url
-                    document.getElementById(localStorage["url"]).remove();
-                    //then we delete it from the database 
                     const params = new URLSearchParams();
-                    params.append('tripID', localStorage["url"]);
+                    params.append("id", trips[i].id);
                     fetch(
                         'api/delete', {
                         method: 'post',
                         body: params
-                    }
-                    )
+                    })
+
+                    document.getElementById(trips[i].id).remove();
+                    document.getElementById(trips[i].timestamp).remove();
+                    //then we delete it from the database 
+                    
                 });
-                buttonLocation.appendChild(button);
-            });
+                buttonLocation.appendChild(buttondel);}
+            }) 
     }
+
     callLoad(currentUrl) {
         localStorage.setItem("url", currentUrl);
         this.onScriptLoad();
-    }
-
-    deleteItinerary() {
-        const params = new URLSearchParams();
-        params.append('tripID', localStorage["url"]);
-        fetch(
-            'api/delete', {
-            method: 'post',
-            body: params
-        }
-        )
     }
 
     render() {
@@ -230,6 +223,8 @@ class Map extends Component {
                 <div class="mapbtn">
                     <Button id='save' onClick={this.saveUserItinerary}>Save this itinerary</Button>
                     <Button id='prev' onClick={this.getSavedItinerary} href="#saved">Previous trips</Button>
+                    <div id="duration">
+                    </div>
                 </div>
                 <div style={{ width: 1000, height: 800, float: 'left', position: 'absolute', left: '35%' }} id={this.props.id}></div>
             </div>

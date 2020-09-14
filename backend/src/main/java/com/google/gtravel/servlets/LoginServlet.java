@@ -1,6 +1,5 @@
 
-package com.google.sps.servlets;
-
+package com.google.gtravel.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
