@@ -6,19 +6,18 @@ import { Link } from 'react-router-dom';
 import { createBrowserHistory } from "history";
 import SECRET_KEY from './config';
 import ITINERARY_KEY from './configMap';
-import Map from './Itinerary';
 import Button from "react-bootstrap/Button";
 import ReactDOM from 'react-dom';
 import ImgKey from './configImg';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 
-let autoComplete1, autoComplete2, currentUserId;
-let lat1, lat2, long1, long2, url;
+let autoComplete1, autoComplete2, autoComplete3, currentUserId;
+let lat1, lat2, long1, long2, lat3, long3, url;
 
 function LandingPage() {
 
-    let google, map, markers = [];
+let google, map, markers = [];
     function initMap() {
         google = window.google;
 
@@ -83,6 +82,7 @@ function LandingPage() {
         }
     }
 
+
     const [hiddenIn, setHiddenIn] = useState(false);
     const [hiddenOut, setHiddenOut] = useState(true);
 
@@ -115,6 +115,7 @@ function LandingPage() {
         handleScriptLoad1(setQuery1);
         handleScriptLoad2(setQuery2);
         initMap();
+        handleScriptLoad3(setQuery3);
     }
 
     const loadScript = (url) => {
@@ -155,6 +156,16 @@ function LandingPage() {
             handlePlaceSelect2(updateQuery)
         );
     }
+     function handleScriptLoad3(updateQuery) {
+        autoComplete3 = new window.google.maps.places.Autocomplete(
+            document.getElementById("searchbox"),
+            {types: ["(cities)"]}
+        );
+
+        autoComplete3.addListener("place_changed", () =>
+            handlePlaceSelect3(updateQuery)
+        );
+    }
 
     async function handlePlaceSelect1(updateQuery) {
         let addressObject1 = autoComplete1.getPlace();
@@ -176,6 +187,16 @@ function LandingPage() {
         updateQuery(query2);
     }
 
+    async function handlePlaceSelect3(updateQuery) {
+        const addressObject3 = autoComplete3.getPlace();
+
+        lat3 = addressObject3.geometry.location.lat();
+        long3 = addressObject3.geometry.location.lng();
+
+        const query3 = addressObject3.formatted_address;
+        updateQuery(query3);
+    }
+
     function nameTheTrip() {
         let tripName = document.getElementById('tripName').value;
         if (tripName !== undefined)
@@ -184,31 +205,42 @@ function LandingPage() {
 
     function submitOptional() {
         nameTheTrip();
-        url = 'locations=*' + lat1 + ',' + long1;
+        let url
+        if (lat1 !== undefined && localStorage["url"] !== undefined)
+        {
+            url = 'locations=' + lat1 + ","+ long1 + "*" + localStorage["url"].split("=")[1];
+            localStorage.setItem("url", url);
+        }
+        if(lat1 !== undefined && localStorage["url"] == undefined)
+        {
+            url = 'locations=' + lat1 + "," + long1;
+            localStorage.setItem("url", url);
+        }
+        if(lat2 !== undefined)
+        {
+            if (localStorage["url"] !== undefined)
+            {
+                url = localStorage["url"] + "*" + lat2 + "," + long2;
+                localStorage.setItem("url", url);
+            }
+            else
+            {
+                url = "locations=" + lat2 + "," + long2;
+                localStorage.setItem("url", url);
+            }
+        }
 
     }
 
     const [query1, setQuery1] = useState("");
     const [query2, setQuery2] = useState("");
+    const [query3, setQuery3] = useState("");
 
     useEffect(() => {
         loadScript(
             `https://maps.googleapis.com/maps/api/js?key=` + Object.values(ITINERARY_KEY)[0] + `&libraries=places`
         );
         authentication();
-        // if (!window.google) {
-        //     const key = Object.values(ITINERARY_KEY)[0];
-        //     var s = document.createElement('script');
-        //     s.type = 'text/javascript';
-        //     s.src = 'https://maps.googleapis.com/maps/api/js?key=' + key;
-        //     s.src += '&libraries=&v=weekly';
-        //     document.head.appendChild(s);
-        //     s.addEventListener('load', e => {
-        //         initMap();
-        //     })
-        // } else {
-        //     initMap();
-        // }
 
     }, []);
 
@@ -239,7 +271,6 @@ function LandingPage() {
                             for (let i = 0; i < attractions.results.length; i++) {
                                 listDiv.appendChild(createListElem(attractions.results[i]));
                             }
-                            localStorage.removeItem("url");
                             listatt.innerHTML = '';
                             listatt.appendChild(listDiv);
                         }
@@ -256,15 +287,19 @@ function LandingPage() {
         let touristsview = '';
        
         const keyImg = Object.values(ImgKey)[0];
-      
-        touristsview += '<img width="300" height="200" src=' + 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
+        let attrPhoto;
+        if( attraction.photos[0] === undefined){
+            attrPhoto = ''+' alt="no photo available"';
+        }else{
+            attrPhoto = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg;
+        }
+        touristsview += '<img width="300" height="200" src=' + attrPhoto + '>' +
             '<br>' +
             '<strong id="rating">' + attraction.rating + '</strong>' +
             '<span id="total_rating">' + '(' + attraction.user_ratings_total + ')' + '</span>' +
             '<br>' +
             '<span id="name">' + attraction.name + '</span>' +
             '<br>';
-
         liElement.innerHTML = touristsview;
 
         const buttonAdd = document.createElement('button');
@@ -275,14 +310,18 @@ function LandingPage() {
             if (localStorage["url"].includes(location)){
                 buttonAdd.innerText = "REMOVE";
                 
+                liElement.style.backgroundColor = 'green';
             }
             else{  
+                liElement.style.backgroundColor = '';
                 buttonAdd.innerText = 'ADD';
                 
               }
         }
         else
-            buttonAdd.innerText = 'ADD';
+            {
+                buttonAdd.style.backgroundColor = '';
+                buttonAdd.innerText = 'ADD';}
 
         buttonAdd.addEventListener('click', () => {
             if (buttonAdd.innerText == "ADD") {
@@ -296,6 +335,7 @@ function LandingPage() {
                     url += "*";
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 url += location;
+                console.log(location);
                 addMarker(location);
 
                 localStorage.setItem("url", url);
@@ -303,6 +343,7 @@ function LandingPage() {
                 liElement.style.backgroundColor = 'green';
             }
             else {
+                liElement.style.backgroundColor = '';
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 removeMarker(location);
 
@@ -359,11 +400,18 @@ function LandingPage() {
             fetch(adress)
                 .then(response => response.json())
                 .then(function(data) {
-                    console.log(data);
                     const listatt = document.getElementById('attractionDiv');
                     const listDiv = document.createElement('div');
                     listDiv.className = 'row';
                     listDiv.innerHTML = '';
+
+                    const removeButtonUp = document.createElement("button");
+                    removeButtonUp.innerText = "Back";
+                    removeButtonUp.addEventListener("click", () => {
+                        revertCity();
+                    })
+                    removeButtonUp.backgroundColor = "cadetblue";
+                    listatt.appendChild(removeButtonUp);
 
                     data.results.sort((a, b) => {
                                 return b.user_ratings_total - a.user_ratings_total;
@@ -373,15 +421,16 @@ function LandingPage() {
                         listDiv.appendChild(createRestaurantElem(data.results[i]));
                     }
 
-                    const removeButton = document.createElement("button");
-                    removeButton.innerText = "Back";
-                    removeButton.addEventListener("click", () => {
+                    const removeButtonDown = document.createElement("button");
+                    removeButtonDown.innerText = "Back";
+                    removeButtonDown.addEventListener("click", () => {
                         revertCity();
                     })
-                    
+                    removeButtonDown.backgroundColor = "cadetblue";
+
                     listatt.innerHTML = '';
                     listatt.appendChild(listDiv);
-                    listatt.appendChild(removeButton);
+                    listatt.appendChild(removeButtonDown);
                 })
 
         })
@@ -391,13 +440,17 @@ function LandingPage() {
         if (localStorage["url"] !== undefined) {
             const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
             if (localStorage["url"].includes(location))
-                buttonAdd.innerText = "REMOVE";
+            {buttonAdd.innerText = "REMOVE";
+            buttonAdd.style.backgroundColor = "green";}
             else
-                buttonAdd.innerText = 'ADD';
+                {buttonAdd.innerText = 'ADD';
+                buttonAdd.style.backgroundColor = '';
+            }
 
         }
         else
-            buttonAdd.innerText = 'ADD';
+            {buttonAdd.innerText = 'ADD';
+            buttonAdd.style.backgroundColor = '';}
 
         buttonAdd.addEventListener('click', () => {
             if (buttonAdd.innerText == "ADD") {
@@ -417,6 +470,7 @@ function LandingPage() {
                 buttonAdd.innerText = "REMOVE";
             }
             else {
+                liElement.style.backgroundColor = '';
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 removeMarker(location);
 
@@ -442,9 +496,19 @@ function LandingPage() {
 
     let searchValue;
     function submitcity() {
-        searchValue = document.getElementById('searchbox').value;
-        localStorage.setItem("searchValue", searchValue);
+
+        let searchValueBefore = document.getElementById('searchbox').value;
+        let searchValue;
+        if(searchValueBefore.includes(","))
+            searchValue = searchValueBefore.split(",")[0];
+        else searchValue = searchValueBefore;
+        if(localStorage["searchValue"] === searchValue){
+            localStorage.removeItem("url");
+        }else
+        { localStorage.setItem("searchValue", searchValue);}
+
         markers = [];
+        console.log(searchValue);
         //this is for getting the list back after using restaurants;
         localStorage.setItem("backupSearchValue", searchValue);
         searchValue.replace(/\s/g, '+');
@@ -572,12 +636,16 @@ function LandingPage() {
                         <div className="col-md-10 col-lg-8 col-xl-7 mx-auto">
                             <div className="form-row">
                                 <div className="col-12 col-md-9 mb-2 mb-md-0">
-                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..."  onKeyPress={handleKeyPress}/>
+                                        <input id="searchbox" className="form-control form-control-lg"
+                                            onChange={event => setQuery3(event.target.value)}
+                                            placeholder="Enter your destination..."
+                                            value={query3}
+                                            onKeyPress={handleKeyPress}
+                                        />
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <button type="submit" id="submit_button" className="btn btn-block btn-lg btn-primary" onClick={submitcity}>Search!</button>
                                     <br />
-
                                 </div>
                             </div>
                         </div>

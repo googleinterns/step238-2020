@@ -95,14 +95,9 @@ class Map extends Component {
                     summaryPanel.innerHTML = '';
 
                     let directionsData = response.routes[0].legs[0];
-                    document.getElementById('duration').innerHTML += " Driving distance is " + directionsData.distance.text + " (" + directionsData.duration.text + ").";
+                    let durationTotal, distanceTotal;
 
                     for (let i = 0; i < route.legs.length; i++) {
-                        let infoWindow = new window.google.maps.InfoWindow();
-
-                        infoWindow.setContent(route.legs[i].start_address);
-                        // infoWindow.open(map);
-
                         const routeSegment = i + 1;
                         summaryPanel.innerHTML +=
                             '<b>Route Segment: ' + routeSegment + '</b><br>';
@@ -110,7 +105,11 @@ class Map extends Component {
                         summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
                         summaryPanel.innerHTML +=
                             route.legs[i].distance.text + '<br><br>';
+                        distanceTotal += parseInt(directionsData.distance.text);
+                        durationTotal += parseInt(directionsData.duration.text);
                     }
+                    document.getElementById('duration').innerHTML += " Total distance is " +distanceTotal + " and the total time is " + directionsData.duration.text;
+
                 } else if (status === window.google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                     delayFactor++;
                     setTimeout(function() {
