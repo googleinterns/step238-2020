@@ -2,4 +2,9 @@
 node_modules/
 backend/src/main/java/com/google/gtravel/servlets/SecretKeys.java
 backend/target/
-
+frontend/src/config.js
+frontend/src/configImg.js
+frontend/src/configMap.js
+frontend/src/configWeather.js
+src/
+target/
