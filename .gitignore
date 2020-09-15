@@ -8,3 +8,4 @@ frontend/src/configMap.js
 frontend/src/configWeather.js
 src/
 target/
+frontend/yarn.lock
