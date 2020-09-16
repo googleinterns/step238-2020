@@ -373,6 +373,7 @@ let google, map, markers = [];
         }
         localStorage.setItem("url", url);
     }
+
     return (
         <div>
             <nav className="navbar navbar-light bg-light static-top">
@@ -412,7 +413,7 @@ let google, map, markers = [];
                 </div>
             </header>
 
-            <section className="container">
+            <section>
                 <p>Create a brand new itinerary by selecting what attractions you would like to visit, after searching the desired city</p>
                 <div id="attractionDiv">
 
@@ -439,8 +440,69 @@ let google, map, markers = [];
                     <input type="text" id="tripName" className="form-control form-control-lg" placeholder="Enter the trip name..." required />
                 </div>
 
-                <br />
+                <br/>
+                <div style={{ width: 1000, height: 1000, float: 'left', left: 0, border: '1px solid black' }} id="predefined-trips">
+                    <ul>
 
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/munich.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Munich</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=48.1376098,11.5799253*48.17546460000001,11.551797*48.1298707,11.5834522*48.1768304,11.5590966*48.1582675,11.5033143*48.1364483,11.5784741")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/moscow.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Moscow</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=55.75393030000001,37.620795*55.75202329999999,37.6174994*55.7446375,37.6054939*55.76013349999999,37.6186486*55.74730539999999,37.6051125*55.7621915,37.6225439")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/bucharest.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Bucharest</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=44.4078713,26.105064*44.4531131,26.0846382*44.4411651,26.0971299*44.4045728,26.1152452*44.43936679999999,26.09587400000001*44.4104938,26.1124879")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/istanbul.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Istanbul</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=41.01650009999999,28.9705194*41.02566780000001,28.97412869999999*41.0115195,28.98337889999999*41.008583,28.980175*41.0054096,28.9768138*41.0080365,28.9767431")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/rome.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Rome</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=41.8914252,12.5152192*41.87351719999999,12.5015034*41.8993212,12.4767522*41.9044205,12.4944377*41.9045479,12.479361*41.906361,12.489744")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/newyork.jpg")}></img>
+                            <br></br>
+                            <strong id="name">New York</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=40.7579747,-73.9855426*40.7587402,-73.9786736*40.703141,-74.0159996*40.7614327,-73.97762159999999*40.6953752,-73.99968439999999*40.757498,-73.986654")}>View Trip</button>
+                        </li>
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/london.jpg")}></img>
+                            <br></br>
+                            <strong id="name">London</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=51.503324,-0.119543*51.5194133,-0.1269566*51.50811239999999,-0.0759493*51.5230174,-0.1543613*51.4978095,-0.1745235*51.5114838,-0.1323114")}>View Trip</button>
+                        </li>
+
+                        <li id="trip">
+                            <img width="300" height="200" src={require("./assets/img/paris.jpg")}></img>
+                            <br></br>
+                            <strong id="name">Paris</strong>
+                            <br></br>
+                            <button onClick={() => callLoad("locations=48.85837009999999,2.2944813*48.8606111,2.337644*48.88670459999999,2.3431043*48.8599614,2.3265614*48.85296820000001,2.3499021*48.86401059999999,2.3059374")}>View Trip</button>
+                        </li>
+                    </ul>
+                </div>
                 <div style={{ width: 1000, height: 1000, float: 'right', position: 'absolute', right: 0 }} id="map"></div>
 
                 <div class="ofb">

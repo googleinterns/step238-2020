@@ -37,6 +37,29 @@
   }
 }
 
+#trip img {
+    border-radius: 8px;
+}
+#trip {
+    padding:8px;
+    border-radius: 8px;
+    border: 2px solid gray;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    object-fit: contain;
+}
+.trip #name {
+    font-size: 25px;
+    font-weight: bold;
+    display: -webkit-inline-box;
+    max-width: 40%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
 #attraction img {
             border-radius: 8px;
         }
