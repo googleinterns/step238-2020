@@ -38,96 +38,90 @@
 }
 
 #trip img {
-    border-radius: 8px;
+  border-radius: 8px;
 }
 #trip {
-    padding:8px;
-    border-radius: 8px;
-    border: 2px solid gray;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 300px;
-    object-fit: contain;
+  padding:8px;
+  border-radius: 8px;
+  border: 2px solid gray;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  object-fit: contain;
 }
 .trip #name {
-    font-size: 25px;
-    font-weight: bold;
-    display: -webkit-inline-box;
-    max-width: 40%;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis
+  font-size: 25px;
+  font-weight: bold;
+  display: -webkit-inline-box;
+  max-width: 40%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis
 }
-
 #attraction img {
-            border-radius: 8px;
-        }
-        #attraction {
-            padding:8px;
-            border-radius: 8px;
-            border: 2px solid gray;
-            display: inline-block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 300px;
-            object-fit: contain;
-        }
-        .attraction #name {
-            font-size: 25px;
-            font-weight: bold;
-            display: -webkit-inline-box;
-            max-width: 40%;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis
-        }
-        .checked {
-            color:orange;
-        }
-        .unchecked {
-            color:gray;
-        }
-        #add-to-list {
-            background-color: #e7e7e7;
-            font-size: 16px;
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            margin: 4px 2px;
-            transition-duration: 0.4s;
-            cursor: pointer;
-        }
-        #add-to-list:hover {
-            background-color: orange;
-            color: white;
-        }
-        #buttondiv {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-
+  border-radius: 8px;
+}
+#attraction {
+  padding:8px;
+  border-radius: 8px;
+  border: 2px solid gray;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  object-fit: contain;
+}
+.attraction #name {
+  font-size: 25px;
+  font-weight: bold;
+  display: -webkit-inline-box;
+  max-width: 40%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+.checked {
+  color:orange;
+}
+.unchecked {
+  color:gray;
+}
+#add-to-list {
+  background-color: #e7e7e7;
+  font-size: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+#add-to-list:hover {
+  background-color: orange;
+  color: white;
+}
+#buttondiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .optionalForm {
-    padding: 20px;
-    background-color: rgb(219, 218, 212);
+  padding: 20px;
+  background-color: rgb(219, 218, 212);
 }
-
 .ofb {
-    display: flex;
-    align-items: center;
-    justify-self: center;
-    flex-direction: column;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  flex-direction: column;
 }
-
 #attractionDiv {
-    align-items: center;
-    align-self: center;
+  align-items: center;
+  align-self: center;
 }
-
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }

@@ -9,9 +9,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
-/** Servlet responsible for deleting  comments. */
+/** Servlet responsible for deleting comments. */
 @WebServlet("/api/delete")
 public class DeleteServlet extends HttpServlet {
 
