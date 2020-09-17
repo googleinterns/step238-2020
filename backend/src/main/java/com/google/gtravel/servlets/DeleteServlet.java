@@ -23,6 +23,7 @@ public class DeleteServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     long id = Long.parseLong(request.getParameter("id"));
 
     Key tripEntityKey = KeyFactory.createKey("Trip", id);
