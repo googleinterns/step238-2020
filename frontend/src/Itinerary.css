@@ -47,20 +47,20 @@ body {
   color: aliceblue;
 }
 
-#title{
-    color: aliceblue;
-    background-color: cadetblue;
+#title {
+  color: aliceblue;
+  background-color: cadetblue;
 }
 
 .mapbtn {
-    display: -ms-inline-flexbox;
+  display: -ms-inline-flexbox;
 }
 
 #saved {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-gap: 10px;
-    justify-content: center;
-    align-content: center;
-    margin-left: 100px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 10px;
+  justify-content: center;
+  align-content: center;
+  margin-left: 100px;
 }

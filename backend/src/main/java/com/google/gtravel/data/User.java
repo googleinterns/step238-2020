@@ -23,7 +23,7 @@ public final class User {
     this.url = url;
     this.id = id;
   }
-    public User(boolean loggedIn, String url) {
+  public User(boolean loggedIn, String url) {
     this.loggedIn = loggedIn;
     this.url = url;
   }

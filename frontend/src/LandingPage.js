@@ -12,12 +12,12 @@ import ImgKey from './configImg';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 
-let autoComplete1, autoComplete2, autoComplete3, currentUserId;
-let lat1, lat2, long1, long2, lat3, long3, url;
+let autoCompleteStart, autoCompleteEnd, currentUserId;
+let latStart, latEnd, longStart, longEnd, url;
 
 function LandingPage() {
 
-let google, map, markers = [];
+    let google, map, markers, infowindows = [];
     function initMap() {
         google = window.google;
 
@@ -82,6 +82,40 @@ let google, map, markers = [];
         }
     }
 
+    function addMarker(location, description) {
+        // Convert string location to JSON object.   
+        const position = {
+            lat: parseFloat(location.split(',')[0]),
+            lng: parseFloat(location.split(',')[1]),
+        };
+        map.setCenter(position);
+
+        const infowindow = new google.maps.InfoWindow({
+        content: description,
+        maxWidth: 350
+    });
+        
+        const markerObject = new google.maps.Marker({
+            position: position,
+        });
+
+        const marker = {
+            position: position,
+            markerObject: markerObject,
+        }
+
+        // Add new marker to the array.
+        markers.push(marker);
+        infowindows.push(infowindow);
+
+        // Update markers on map page.
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].markerObject.setMap(map);
+            markers[i].markerObject.addListener("click", () => {
+              infowindows[i].open(map, markers[i].markerObject);
+        });
+        }
+    }
 
     const [hiddenIn, setHiddenIn] = useState(false);
     const [hiddenOut, setHiddenOut] = useState(true);
@@ -112,10 +146,9 @@ let google, map, markers = [];
     }
 
     function calls() {
-        handleScriptLoad1(setQuery1);
-        handleScriptLoad2(setQuery2);
+        handleLoadStartPoint(setqueryStart);
+        handleLoadEndPoint(setqueryEnd);
         initMap();
-        handleScriptLoad3(setQuery3);
     }
 
     const loadScript = (url) => {
@@ -138,63 +171,44 @@ let google, map, markers = [];
         document.getElementsByTagName("head")[0].appendChild(script);
     };
 
-    function handleScriptLoad1(updateQuery) {
-        autoComplete1 = new window.google.maps.places.Autocomplete(
+    function handleLoadStartPoint(updateQuery) {
+ 
+        autoCompleteStart = new window.google.maps.places.Autocomplete(
             document.getElementById("startplace"),
         );
 
-        autoComplete1.addListener("place_changed", () =>
+        autoCompleteStart.addListener("place_changed", () =>
             handlePlaceSelect1(updateQuery)
         );
     }
-    function handleScriptLoad2(updateQuery) {
-        autoComplete2 = new window.google.maps.places.Autocomplete(
+    function handleLoadEndPoint(updateQuery) {
+        autoCompleteEnd = new window.google.maps.places.Autocomplete(
             document.getElementById("endplace")
         );
 
-        autoComplete2.addListener("place_changed", () =>
+        autoCompleteEnd.addListener("place_changed", () =>
             handlePlaceSelect2(updateQuery)
-        );
-    }
-     function handleScriptLoad3(updateQuery) {
-        autoComplete3 = new window.google.maps.places.Autocomplete(
-            document.getElementById("searchbox"),
-            {types: ["(cities)"]}
-        );
-
-        autoComplete3.addListener("place_changed", () =>
-            handlePlaceSelect3(updateQuery)
         );
     }
 
     async function handlePlaceSelect1(updateQuery) {
-        let addressObject1 = autoComplete1.getPlace();
+        let addressObject1 = autoCompleteStart.getPlace();
 
-        lat1 = addressObject1.geometry.location.lat();
-        long1 = addressObject1.geometry.location.lng();
+        latStart = addressObject1.geometry.location.lat();
+        longStart = addressObject1.geometry.location.lng();
 
-        let query1 = addressObject1.formatted_address;
-        updateQuery(query1);
+        let queryStart = addressObject1.formatted_address;
+        updateQuery(queryStart);
     }
 
     async function handlePlaceSelect2(updateQuery) {
-        const addressObject2 = autoComplete2.getPlace();
+        const addressObject2 = autoCompleteEnd.getPlace();
 
-        lat2 = addressObject2.geometry.location.lat();
-        long2 = addressObject2.geometry.location.lng();
+        latEnd = addressObject2.geometry.location.lat();
+        longEnd = addressObject2.geometry.location.lng();
 
-        const query2 = addressObject2.formatted_address;
-        updateQuery(query2);
-    }
-
-    async function handlePlaceSelect3(updateQuery) {
-        const addressObject3 = autoComplete3.getPlace();
-
-        lat3 = addressObject3.geometry.location.lat();
-        long3 = addressObject3.geometry.location.lng();
-
-        const query3 = addressObject3.formatted_address;
-        updateQuery(query3);
+        const queryEnd = addressObject2.formatted_address;
+        updateQuery(queryEnd);
     }
 
     function nameTheTrip() {
@@ -206,35 +220,29 @@ let google, map, markers = [];
     function submitOptional() {
         nameTheTrip();
         let url
-        if (lat1 !== undefined && localStorage["url"] !== undefined)
-        {
-            url = 'locations=' + lat1 + ","+ long1 + "*" + localStorage["url"].split("=")[1];
+        if (latStart !== undefined && localStorage["url"] !== undefined) {
+            url = 'locations=' + latStart + "," + longStart + "*" + localStorage["url"].split("=")[1];
             localStorage.setItem("url", url);
         }
-        if(lat1 !== undefined && localStorage["url"] == undefined)
-        {
-            url = 'locations=' + lat1 + "," + long1;
+        if (latStart !== undefined && localStorage["url"] == undefined) {
+            url = 'locations=' + latStart + "," + longStart;
             localStorage.setItem("url", url);
         }
-        if(lat2 !== undefined)
-        {
-            if (localStorage["url"] !== undefined)
-            {
-                url = localStorage["url"] + "*" + lat2 + "," + long2;
+        if (latEnd !== undefined) {
+            if (localStorage["url"] !== undefined) {
+                url = localStorage["url"] + "*" + latEnd + "," + longEnd;
                 localStorage.setItem("url", url);
             }
-            else
-            {
-                url = "locations=" + lat2 + "," + long2;
+            else {
+                url = "locations=" + latEnd + "," + longEnd;
                 localStorage.setItem("url", url);
             }
         }
 
     }
 
-    const [query1, setQuery1] = useState("");
-    const [query2, setQuery2] = useState("");
-    const [query3, setQuery3] = useState("");
+    const [queryStart, setqueryStart] = useState("");
+    const [queryEnd, setqueryEnd] = useState("");
 
     useEffect(() => {
         loadScript(
@@ -285,12 +293,12 @@ let google, map, markers = [];
         const liElement = document.createElement("li");
         liElement.id = 'attraction';
         let touristsview = '';
-       
+
         const keyImg = Object.values(ImgKey)[0];
         let attrPhoto;
-        if( attraction.photos[0] === undefined){
-            attrPhoto = ''+' alt="no photo available"';
-        }else{
+        if (attraction.photos[0] === undefined) {
+            attrPhoto = '' + ' alt="no photo available"';
+        } else {
             attrPhoto = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg;
         }
         touristsview += '<img width="300" height="200" src=' + attrPhoto + '>' +
@@ -307,21 +315,21 @@ let google, map, markers = [];
 
         if (localStorage["url"] !== undefined) {
             const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
-            if (localStorage["url"].includes(location)){
+            if (localStorage["url"].includes(location)) {
                 buttonAdd.innerText = "REMOVE";
-                
+
                 liElement.style.backgroundColor = 'green';
             }
-            else{  
+            else {
                 liElement.style.backgroundColor = '';
                 buttonAdd.innerText = 'ADD';
-                
-              }
+
+            }
         }
-        else
-            {
-                buttonAdd.style.backgroundColor = '';
-                buttonAdd.innerText = 'ADD';}
+        else {
+            liElement.style.backgroundColor = '';
+            buttonAdd.innerText = 'ADD';
+        }
 
         buttonAdd.addEventListener('click', () => {
             if (buttonAdd.innerText == "ADD") {
@@ -335,7 +343,7 @@ let google, map, markers = [];
                     url += "*";
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 url += location;
-                console.log(location);
+                
                 addMarker(location);
 
                 localStorage.setItem("url", url);
@@ -365,16 +373,13 @@ let google, map, markers = [];
         return liElement;
     }
 
-
-
-
     function createListElem(attraction) {
         const liElement = document.createElement("li");
         liElement.id = 'attraction';
         let touristsview = '';
-      
+
         const keyImg = Object.values(ImgKey)[0];
-        
+
         touristsview += '<img width="300" height="200" src=' + 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
             '<br>' +
             '<strong id="rating">' + attraction.rating + '</strong>' +
@@ -393,9 +398,6 @@ let google, map, markers = [];
             const lat = attraction.geometry.location.lat;
             const lng = attraction.geometry.location.lng;
 
-            //const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + searchValue +
-               // '&radius=150000&type=restaurant&key=' + keyImg;
-            //console.log(url);
             const adress = "api/restaurants?lat=" + lat + "&long=" + lng;
             fetch(adress)
                 .then(response => response.json())
@@ -411,11 +413,11 @@ let google, map, markers = [];
                         revertCity();
                     })
                     removeButtonUp.backgroundColor = "cadetblue";
-                    listatt.appendChild(removeButtonUp);
+
 
                     data.results.sort((a, b) => {
-                                return b.user_ratings_total - a.user_ratings_total;
-                            }); 
+                        return b.user_ratings_total - a.user_ratings_total;
+                    });
 
                     for (let i = 0; i < data.results.length; i++) {
                         listDiv.appendChild(createRestaurantElem(data.results[i]));
@@ -429,6 +431,7 @@ let google, map, markers = [];
                     removeButtonDown.backgroundColor = "cadetblue";
 
                     listatt.innerHTML = '';
+                    listatt.appendChild(removeButtonUp);
                     listatt.appendChild(listDiv);
                     listatt.appendChild(removeButtonDown);
                 })
@@ -439,18 +442,20 @@ let google, map, markers = [];
         buttonAdd.id = 'add-to-list';
         if (localStorage["url"] !== undefined) {
             const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
-            if (localStorage["url"].includes(location))
-            {buttonAdd.innerText = "REMOVE";
-            buttonAdd.style.backgroundColor = "green";}
-            else
-                {buttonAdd.innerText = 'ADD';
-                buttonAdd.style.backgroundColor = '';
+            if (localStorage["url"].includes(location)) {
+                buttonAdd.innerText = "REMOVE";
+                liElement.style.backgroundColor = "green";
+            }
+            else {
+                buttonAdd.innerText = 'ADD';
+                liElement.style.backgroundColor = '';
             }
 
         }
-        else
-            {buttonAdd.innerText = 'ADD';
-            buttonAdd.style.backgroundColor = '';}
+        else {
+            buttonAdd.innerText = 'ADD';
+            liElement.style.backgroundColor = '';
+        }
 
         buttonAdd.addEventListener('click', () => {
             if (buttonAdd.innerText == "ADD") {
@@ -465,9 +470,18 @@ let google, map, markers = [];
                     url += "*";
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 url += location;
-                addMarker(location);
+                
                 localStorage.setItem("url", url);
                 buttonAdd.innerText = "REMOVE";
+
+                let attractionName = buttonAdd.parentElement.children[5].innerText;
+                attractionName = attractionName.replace(/\s/g, "_");
+
+                fetch(`api/webscrapper?attractionName=${attractionName}`, {
+                    method: 'GET'
+                }).then((response) => response.json())
+                 .then((description) => addMarker(location, description))
+                
             }
             else {
                 liElement.style.backgroundColor = '';
@@ -484,9 +498,9 @@ let google, map, markers = [];
                 localStorage.setItem("url", url);
 
                 buttonAdd.innerText = "ADD";
-                liElement.style.backgroundColor = "white";
+                liElement.style.backgroundColor = "";
 
-                
+
             }
         });
         liElement.appendChild(buttonAdd);
@@ -497,18 +511,14 @@ let google, map, markers = [];
     let searchValue;
     function submitcity() {
 
-        let searchValueBefore = document.getElementById('searchbox').value;
-        let searchValue;
-        if(searchValueBefore.includes(","))
-            searchValue = searchValueBefore.split(",")[0];
-        else searchValue = searchValueBefore;
-        if(localStorage["searchValue"] === searchValue){
+        let searchValue = document.getElementById('searchbox').value;
+ 
+        if (localStorage["searchValue"] === searchValue) {
             localStorage.removeItem("url");
-        }else
-        { localStorage.setItem("searchValue", searchValue);}
+        } else { localStorage.setItem("searchValue", searchValue); }
 
         markers = [];
-        console.log(searchValue);
+
         //this is for getting the list back after using restaurants;
         localStorage.setItem("backupSearchValue", searchValue);
         searchValue.replace(/\s/g, '+');
@@ -605,7 +615,7 @@ let google, map, markers = [];
     }
 
     function handleKeyPress(event) {
-        if(event.key === 'Enter'){
+        if (event.key === 'Enter') {
             submitcity();
         }
     }
@@ -636,12 +646,7 @@ let google, map, markers = [];
                         <div className="col-md-10 col-lg-8 col-xl-7 mx-auto">
                             <div className="form-row">
                                 <div className="col-12 col-md-9 mb-2 mb-md-0">
-                                        <input id="searchbox" className="form-control form-control-lg"
-                                            onChange={event => setQuery3(event.target.value)}
-                                            placeholder="Enter your destination..."
-                                            value={query3}
-                                            onKeyPress={handleKeyPress}
-                                        />
+                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..." onKeyPress={handleKeyPress} />
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <button type="submit" id="submit_button" className="btn btn-block btn-lg btn-primary" onClick={submitcity}>Search!</button>
@@ -668,15 +673,15 @@ let google, map, markers = [];
                 <div className="optionalForm" id="optionalForm" style={{ display: 'none', align: 'centre' }}>
                     <input id="startplace"
 
-                        onChange={event => setQuery1(event.target.value)}
+                        onChange={event => setqueryStart(event.target.value)}
                         placeholder="Enter your hotel or the start point of trip"
-                        value={query1}
+                        value={queryStart}
                     />
                     <input id="endplace"
 
-                        onChange={event => setQuery2(event.target.value)}
+                        onChange={event => setqueryEnd(event.target.value)}
                         placeholder="Enter your hotel or the end point of trip"
-                        value={query2}
+                        value={queryEnd}
                     />
 
                     <DayPickerInput onDayChange={day => console.log(day)} />
@@ -692,7 +697,7 @@ let google, map, markers = [];
                     </Link>
                 </div>
             </section>
-           
+
             <section className="features-icons bg-light text-center" style={{ marginTop: '50px' }}>
                 <div className="container">
                     <div className="row">

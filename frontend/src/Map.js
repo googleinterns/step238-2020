@@ -12,7 +12,7 @@ class Map extends Component {
         this.getSavedItinerary = this.getSavedItinerary.bind(this);
         this.saveUserItinerary = this.saveUserItinerary.bind(this);
         this.callLoad = this.callLoad.bind(this);
-        this.m_get_directions_route = this.m_get_directions_route.bind(this);
+        this.generateRouteDirections = this.generateRouteDirections.bind(this);
     }
 
     onScriptLoad() {
@@ -22,6 +22,7 @@ class Map extends Component {
 
         //let query = window.location.search.substring(1);
         let query = localStorage["url"];
+
         let vars = query.split("&");
         let query_string = {};
 
@@ -33,10 +34,6 @@ class Map extends Component {
         }
 
         let urlParameters = query_string;
-        //const centerPoint = urlParameters.locations.split('*')[0];
-
-        //const centerLat = parseFloat(centerPoint.split(',')[0]);
-        //const centerLong = parseFloat(centerPoint.split(',')[1]);
 
         const directionsService = new window.google.maps.DirectionsService();
         const directionsRenderer = new window.google.maps.DirectionsRenderer();
@@ -49,7 +46,6 @@ class Map extends Component {
         query_string = {};
 
         for (var i = 0; i < vars.length; i++) {
-
             const pair = vars[i].split("=");
             const key = decodeURIComponent(pair[0]);
             const value = decodeURIComponent(pair[1]);
@@ -78,12 +74,12 @@ class Map extends Component {
             travelMode: window.google.maps.TravelMode.DRIVING
         };
 
-        this.m_get_directions_route(delayFactor, request, directionsRenderer, directionsService);
+        this.generateRouteDirections(delayFactor, request, directionsRenderer, directionsService);
 
         this.props.onMapLoad(map)
     }
 
-    m_get_directions_route(delayFactor, request, directionsRenderer, directionsService) {
+    generateRouteDirections(delayFactor, request, directionsRenderer, directionsService) {
         directionsService.route(
             request,
             (response, status) => {

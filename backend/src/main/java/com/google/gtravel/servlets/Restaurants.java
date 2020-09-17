@@ -53,10 +53,9 @@ public class Restaurants extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    
+
     String latitude = request.getParameter("lat");
     String longitude = request.getParameter("long");
-
 
     String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=";
     url += latitude;
