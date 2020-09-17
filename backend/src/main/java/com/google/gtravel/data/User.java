@@ -18,15 +18,18 @@ public final class User {
   private boolean loggedIn;
   private String url;
   private String id;
+
   public User(boolean loggedIn, String url, String id) {
     this.loggedIn = loggedIn;
     this.url = url;
     this.id = id;
   }
+
   public User(boolean loggedIn, String url) {
     this.loggedIn = loggedIn;
     this.url = url;
   }
+
   public boolean getLoggedIn() {
     return this.loggedIn;
   }
