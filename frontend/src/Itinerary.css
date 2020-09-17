@@ -23,7 +23,6 @@ body {
   float: left;
   width: 70%;
   visibility: visible;
-  border: thin solid black;
 }
 
 #left-panel {
@@ -58,14 +57,14 @@ body {
 }
 
 .mapbtn {
-    display: -ms-inline-flexbox;
+  display: -ms-inline-flexbox;
 }
 
 #saved {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    grid-gap: 10px;
-    justify-content: center;
-    align-content: center;
-    margin-left: 100px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 10px;
+  justify-content: center;
+  align-content: center;
+  margin-left: 100px;
 }
