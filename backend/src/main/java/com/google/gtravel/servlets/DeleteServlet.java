@@ -29,5 +29,6 @@ public class DeleteServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.delete(tripEntityKey);
     response.sendRedirect("/");
+
   }
 }
