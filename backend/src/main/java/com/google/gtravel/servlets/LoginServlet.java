@@ -1,4 +1,4 @@
-package com.google.gtravel.servlets;
+package com.google.sps.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -29,5 +29,5 @@ public class LoginServlet extends HttpServlet {
     Gson gson = new Gson();
     response.setContentType("application/json");
     response.getWriter().println(gson.toJson(user));
- }
+  }
 }
