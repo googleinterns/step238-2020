@@ -52,6 +52,11 @@ body {
   background-color: cadetblue;
 }
 
+#weather {
+  color: white;
+  font-weight: bold;
+}
+
 .mapbtn {
   display: -ms-inline-flexbox;
 }
