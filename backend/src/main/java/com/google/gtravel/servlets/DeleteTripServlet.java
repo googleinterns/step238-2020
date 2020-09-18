@@ -18,7 +18,7 @@ public class DeleteServlet extends HttpServlet {
   protected void service(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     doPost(request, response);
-  } 
+  }
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     long id = Long.parseLong(request.getParameter("id"));
@@ -27,6 +27,5 @@ public class DeleteServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.delete(tripEntityKey);
     response.sendRedirect("/");
-
   }
 }
