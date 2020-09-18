@@ -14,6 +14,7 @@
 
 package com.google.gtravel.servlets;
 
+import com.google.gson.Gson;
 import java.io.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +27,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import com.google.gson.Gson;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -51,9 +51,8 @@ public class WebScrapper extends HttpServlet {
       Elements paragraphs = content.getElementsByTag("p");
 
       String paragraph = "";
-      for (Element pElement: paragraphs) {
-        if(!(pElement.text().isEmpty()))
-        {
+      for (Element pElement : paragraphs) {
+        if(!(pElement.text().isEmpty())) {
           paragraph = pElement.text(); 
           break;
         }
@@ -61,8 +60,7 @@ public class WebScrapper extends HttpServlet {
       Gson gson = new Gson();
       response.setContentType("application/json");
       response.getWriter().println(gson.toJson(paragraph));
-    } catch(Exception e) {
-       //System.out.println(e.getMessage());
+    } catch (Exception e) {
       String message = "No description to be shown";
       Gson gson = new Gson();
       response.setContentType("application/json");
