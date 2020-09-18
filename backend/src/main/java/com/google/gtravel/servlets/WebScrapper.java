@@ -45,7 +45,7 @@ public class WebScrapper extends HttpServlet {
 
       String paragraph = "";
       for (Element pElement : paragraphs) {
-        if(!(pElement.text().isEmpty())) {
+        if (!(pElement.text().isEmpty())) {
           paragraph = pElement.text(); 
           break;
         }
