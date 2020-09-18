@@ -37,7 +37,7 @@ public class WebScrapper extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String description = request.getParameter("attractionName");
 
-    try{
+    try {
       Document document = getWikiDocument(description);
       Elements contents = document.getElementsByClass("mw-parser-output");
       Element content = contents.first();
