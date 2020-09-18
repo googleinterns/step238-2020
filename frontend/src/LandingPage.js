@@ -37,7 +37,7 @@ function LandingPage() {
         );
         authentication();
 
-    });
+    }, []);
     function removeMarker(location) {
         // Convert string location to JSON object.
         const position = {
