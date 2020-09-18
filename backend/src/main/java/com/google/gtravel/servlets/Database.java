@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/api/database")
 public class Database extends HttpServlet {
 
-  // Get all trips that assigned to specific user.
+  // Get all trips that are assigned to a specific user.
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Make query by userID
@@ -46,12 +46,13 @@ public class Database extends HttpServlet {
 
     // Iterate results and add each one to trips array.
     for (Entity entity : results.asIterable()) {
+      long id = entity.getKey().getId();
       userID = (String) entity.getProperty("userID");
       String tripID = (String) entity.getProperty("tripID");
       String tripName = (String) entity.getProperty("tripName");
       long timestamp = (long) entity.getProperty("timestamp");
 
-      Trip newTrip = new Trip(userID, tripID, tripName, timestamp);
+      Trip newTrip = new Trip(id, userID, tripID, tripName, timestamp);
 
       trips.add(newTrip);
     }

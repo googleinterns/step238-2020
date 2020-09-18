@@ -52,6 +52,11 @@
   <artifactId>appengine-api-1.0-sdk</artifactId>
   <version>1.9.59</version>
 </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.2</version>
+        </dependency>
   </dependencies>
 
   <build>

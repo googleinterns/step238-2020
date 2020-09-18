@@ -1,9 +1,9 @@
 package com.google.gtravel.servlets;
 
-public class SecretKeys {
-  private final String GCP_API_KEY = "AAIzaSyDNZQ2ywFAOpSWjJS33BWKNfTtB4jSskAs";
+public final class SecretKeys {
+  private final String key = "INSERT YOUR OWN API KEY HERE";
 
   public String getGCP_API_KEY() {
-    return GCP_API_KEY;
+    return key;
   }
 }

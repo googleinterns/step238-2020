@@ -21,7 +21,7 @@ body {
 #map {
   height: 100%;
   float: left;
-  width: 70%;
+  width: 100%;
   visibility: visible;
 }
 
@@ -62,7 +62,7 @@ body {
 
 #saved {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto;
   grid-gap: 10px;
   justify-content: center;
   align-content: center;

@@ -15,12 +15,14 @@
 package com.google.gtravel.data;
 
 public class Trip {
+  public long id;
   public String userID;
   public String tripID;
   public String tripName;
   public long timestamp;
 
-  public Trip(String userID, String tripID, String tripName, long timestamp) {
+  public Trip(long id, String userID, String tripID, String tripName, long timestamp) {
+    this.id = id;
     this.userID = userID;
     this.tripID = tripID;
     this.tripName = tripName;
