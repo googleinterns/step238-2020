@@ -1,4 +1,9 @@
 
 node_modules/
 backend/target/
-
+frontend/src/config.js
+frontend/src/configImg.js
+frontend/src/configMap.js
+frontend/src/configWeather.js
+src/
+target/

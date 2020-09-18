@@ -30,7 +30,6 @@ function LandingPage() {
         });
     }
 
-
     useEffect(() => {
         loadScript(
             'https://maps.googleapis.com/maps/api/js?key=' + Object.values(ITINERARY_KEY)[0] + '&libraries=places'
@@ -188,6 +187,7 @@ function LandingPage() {
             handlePlaceSelectStart(updateQuery)
         );
     }
+
     function handleLoadEndPoint(updateQuery) {
         autoCompleteEnd = new window.google.maps.places.Autocomplete(
             document.getElementById("endplace")
@@ -226,7 +226,7 @@ function LandingPage() {
 
     function submitOptional() {
         nameTheTrip();
-        let url
+        let url;
         if (latStart !== undefined && localStorage["url"] !== undefined) {
             url = 'locations=' + latStart + "," + longStart + "*" + localStorage["url"].split("=")[1];
             localStorage.setItem("url", url);
@@ -466,6 +466,7 @@ function LandingPage() {
                 }
                 else
                     url += "*";
+
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 url += location;
 
@@ -482,6 +483,7 @@ function LandingPage() {
 
             }
             else {
+
                 liElement.style.backgroundColor = '';
                 const location = attraction.geometry.location.lat + "," + attraction.geometry.location.lng;
                 removeMarker(location);
@@ -490,6 +492,7 @@ function LandingPage() {
                 let toDelete = '*' + location;
 
                 url = url.replace(toDelete, "");//to delete the location if it's like *location;
+
                 toDelete = toString(attraction.geometry.lng + "," + attraction.geometry.lat);
                 url = url.replace(toDelete, ""); //to delete the location if it's the single location, or if it's the first one
 
@@ -520,6 +523,7 @@ function LandingPage() {
 
         //this is for getting the list back after using restaurants;
         localStorage.setItem("backupSearchValue", searchValue);
+
         searchValue.replace(/\s/g, '+');
         const key = Object.values(ITINERARY_KEY)[0];
         const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + searchValue +
@@ -713,7 +717,9 @@ function LandingPage() {
                     <input type="text" id="tripName" className="form-control form-control-lg" placeholder="Enter the trip name..." required />
                 </div>
 
+
                 <br />
+
                 <div style={{ width: 1000, height: 1000, float: 'left', left: 0, border: '1px solid black' }} id="predefined-trips">
                     <ul>
 

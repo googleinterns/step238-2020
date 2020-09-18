@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import ITINERARY_KEY from "./configMap";
+import WEATHER_KEY from "./configWeather";
 import './Itinerary.css';
 import Button from "react-bootstrap/Button";
 
@@ -14,13 +15,11 @@ class Map extends Component {
         this.callLoad = this.callLoad.bind(this);
         this.generateRouteDirections = this.generateRouteDirections.bind(this);
     }
-
     onScriptLoad() {
         const map = new window.google.maps.Map(
             document.getElementById(this.props.id),
             this.props.options);
 
-        //let query = window.location.search.substring(1);
         let query = localStorage["url"];
 
         let vars = query.split("&");
@@ -53,6 +52,7 @@ class Map extends Component {
         }
 
         urlParameters = query_string;
+
         const locations = urlParameters.locations.split('*');
 
         const start = locations[0];
@@ -63,6 +63,42 @@ class Map extends Component {
                 location: locations[i],
                 stopover: true,
             });
+        }
+
+
+        if (urlParameters.date != undefined) {
+            const datetime = urlParameters.date;
+            const lat = start.split(',')[0];
+            const long = start.split(',')[1];
+            const key = Object.values(WEATHER_KEY)[0];
+
+            // Create the API url for starting point.
+            let url = 'https://api.openweathermap.org/data/2.5/onecall?lat=';
+            url += lat;
+            url += '&lon=';
+            url += long;
+            url += '&exclude=current,minutely,hourly&appid=';
+            url += key;
+
+            // Call the API for 8 days weather forecast.
+            fetch(url)
+                .then(response => response.text())
+                .then(response => JSON.parse(response))
+                .then(function(response) {
+                    let weatherDiv = document.getElementById('weather');
+                    response = response.daily;
+                    // Find the correct datetime range for date parameter that came from landing page.
+                    for (let i = 0; i < response.length - 1; i++) {
+
+                        if (response[i].dt <= datetime &&
+                            datetime <= response[i+1].dt) {
+                                // Show the correct day's weather forecast.
+                                weatherDiv.innerHTML = Math.floor(response[i].temp.day - 273.15);
+                                weatherDiv.innerHTML += "°C " + response[i].weather[0].main;
+                                break;
+                            }
+                    }
+                });
         }
 
         let delayFactor = 0;
@@ -208,7 +244,9 @@ class Map extends Component {
             <div>
 
                 <div id="left-panel">
+                    <div id="weather"></div>
                     <div id="directions-panel"></div>
+                    
                     <br />
                     <br />
                     <br />
