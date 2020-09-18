@@ -46,7 +46,7 @@ public class WebScrapper extends HttpServlet {
       String paragraph = "";
       for (Element pElement : paragraphs) {
         if (!(pElement.text().isEmpty())) {
-          paragraph = pElement.text(); 
+          paragraph = pElement.text();
           break;
         }
       }
@@ -59,6 +59,5 @@ public class WebScrapper extends HttpServlet {
       response.setContentType("application/json");
       response.getWriter().println(gson.toJson(message));
     }
-
   }
 }
