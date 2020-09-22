@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { render } from 'react-dom';
 import ITINERARY_KEY from "./configMap";
 import WEATHER_KEY from "./configWeather";
 import './Itinerary.css';
@@ -25,7 +24,7 @@ class Map extends Component {
         let vars = query.split("&");
         let query_string = {};
 
-        for (var i = 0; i < vars.length; i++) {
+        for (let i = 0; i < vars.length; i++) {
             const pair = vars[i].split("=");
             const key = decodeURIComponent(pair[0]);
             const value = decodeURIComponent(pair[1]);
@@ -65,38 +64,39 @@ class Map extends Component {
             });
         }
 
-
-        if (urlParameters.date != undefined) {
-            const datetime = urlParameters.date;
+        if (localStorage["date"] !== undefined) {
+            const datetime = localStorage["date"];
             const lat = start.split(',')[0];
             const long = start.split(',')[1];
             const key = Object.values(WEATHER_KEY)[0];
 
             // Create the API url for starting point.
-            let url = 'https://api.openweathermap.org/data/2.5/onecall?lat=';
-            url += lat;
-            url += '&lon=';
-            url += long;
-            url += '&exclude=current,minutely,hourly&appid=';
-            url += key;
+            let urlWeather = 'https://api.openweathermap.org/data/2.5/onecall?lat=';
+            urlWeather += lat;
+            urlWeather += '&lon=';
+            urlWeather += long;
+            urlWeather += '&exclude=current,minutely,hourly&appid=';
+            urlWeather += key;
 
             // Call the API for 8 days weather forecast.
-            fetch(url)
-                .then(response => response.text())
-                .then(response => JSON.parse(response))
+            fetch(urlWeather)
+                .then(response => response.json())
                 .then(function(response) {
+                   
                     let weatherDiv = document.getElementById('weather');
                     response = response.daily;
+
                     // Find the correct datetime range for date parameter that came from landing page.
                     for (let i = 0; i < response.length - 1; i++) {
 
                         if (response[i].dt <= datetime &&
-                            datetime <= response[i+1].dt) {
-                                // Show the correct day's weather forecast.
-                                weatherDiv.innerHTML = Math.floor(response[i].temp.day - 273.15);
-                                weatherDiv.innerHTML += "°C " + response[i].weather[0].main;
-                                break;
-                            }
+                            datetime <= response[i + 1].dt) {
+                            // Show the correct day's weather forecast.
+                            weatherDiv.innerHTML = "Weather forecast: ";
+                            weatherDiv.innerHTML += Math.floor(response[i].temp.day - 273.15);
+                            weatherDiv.innerHTML += "°C " + response[i].weather[0].main;
+                            break;
+                        }
                     }
                 });
         }
@@ -127,7 +127,7 @@ class Map extends Component {
                     summaryPanel.innerHTML = '';
 
                     let directionsData = response.routes[0].legs[0];
-                    let durationTotal, distanceTotal;
+                    let durationTotal = 0.0, distanceTotal = 0.0;
 
                     for (let i = 0; i < route.legs.length; i++) {
                         const routeSegment = i + 1;
@@ -137,10 +137,11 @@ class Map extends Component {
                         summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
                         summaryPanel.innerHTML +=
                             route.legs[i].distance.text + '<br><br>';
-                        distanceTotal += parseInt(directionsData.distance.text);
-                        durationTotal += parseInt(directionsData.duration.text);
+
+                        distanceTotal += Math.round(parseFloat(directionsData.distance.text));
+                        durationTotal += Math.round(parseFloat(directionsData.duration.text));
                     }
-                    document.getElementById('duration').innerHTML += " Total distance is " +distanceTotal + " and the total time is " + directionsData.duration.text;
+                    document.getElementById('duration').innerHTML = " Total distance is " + distanceTotal + " km and the total time is " + durationTotal + " min";
 
                 } else if (status === window.google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                     delayFactor++;
@@ -177,9 +178,15 @@ class Map extends Component {
         fetch('/api/database', {
             method: 'POST',
             body: params
-        });
-        document.getElementById("save").innerText = "Trip " + localStorage["searchValue"] + " was saved";
-        document.getElementById("save").style.backgroundColor = "green";
+        }).then((response) => response.json())
+            .then((text) => {
+                document.getElementById("save").innerText = text;
+                if (text === "trip already saved")
+                    document.getElementById("save").style.backgroundColor = "red";
+                else
+                    document.getElementById("save").style.backgroundColor = "green";
+            });
+
     }
 
     getSavedItinerary() {
@@ -187,16 +194,11 @@ class Map extends Component {
             method: 'GET'
         }).then((response) => response.json())
             .then((trips) => {
-                let index = 0;
-
-                if (localStorage["index"] === undefined)
-                    localStorage.setItem("index", trips.length - 1);
-
 
                 // we get the buttons location
                 let buttonLocation = document.getElementById("saved");
                 // delete all the previous buttons
-                buttonLocation.innerHTML = "<h4>Previous created trips</h4>"+"<br/>"+"<br/>";
+                buttonLocation.innerHTML = "<h4>Previous created trips</h4> <br/> <br/>";
                 //we create the buttons
                 for (let i = 0; i < trips.length; i++) {
                     const button = document.createElement("button");
@@ -211,27 +213,28 @@ class Map extends Component {
 
                     buttonLocation.appendChild(button);
 
-                 //we add the delete button
-                const buttondel = document.createElement("button");
-                buttondel.innerText = "remove trip";
-                buttondel.id = trips[i].timestamp;
-                buttondel.addEventListener("click", function() {
-                    //we first delete the button with the url
-                    const params = new URLSearchParams();
-                    params.append("id", trips[i].id);
-                    fetch(
-                        'api/delete', {
-                        method: 'post',
-                        body: params
-                    })
+                    //we add the delete button
+                    const buttondel = document.createElement("button");
+                    buttondel.innerText = "remove trip";
+                    buttondel.id = trips[i].timestamp;
+                    buttondel.addEventListener("click", function() {
+                        //we first delete the button with the url
+                        const params = new URLSearchParams();
+                        params.append("id", trips[i].id);
+                        fetch(
+                            'api/delete', {
+                            method: 'post',
+                            body: params
+                        })
 
-                    document.getElementById(trips[i].id).remove();
-                    document.getElementById(trips[i].timestamp).remove();
-                    //then we delete it from the database 
-                    
-                });
-                buttonLocation.appendChild(buttondel);}
-            }) 
+                        document.getElementById(trips[i].id).remove();
+                        document.getElementById(trips[i].timestamp).remove();
+                        //then we delete it from the database 
+
+                    });
+                    buttonLocation.appendChild(buttondel);
+                }
+            })
     }
 
     callLoad(currentUrl) {
@@ -246,7 +249,7 @@ class Map extends Component {
                 <div id="left-panel">
                     <div id="weather"></div>
                     <div id="directions-panel"></div>
-                    
+
                     <br />
                     <br />
                     <br />

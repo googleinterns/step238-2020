@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import './App.css';
-import { Client, Status } from "@googlemaps/google-maps-services-js";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Link } from 'react-router-dom';
-import { createBrowserHistory } from "history";
 import SECRET_KEY from './config';
 import ITINERARY_KEY from './configMap';
 import Button from "react-bootstrap/Button";
-import ReactDOM from 'react-dom';
 import ImgKey from './configImg';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
@@ -36,7 +32,7 @@ function LandingPage() {
         );
         authentication();
 
-    }, []);
+    });
     function removeMarker(location) {
         // Convert string location to JSON object.
         const position = {
@@ -51,8 +47,8 @@ function LandingPage() {
 
         // Find the specific marker and remove from the array.
         for (let i = 0; i < markers.length; i++) {
-            if (markers[i].position.lat == position.lat &&
-                markers[i].position.lng == position.lng) {
+            if (markers[i].position.lat === position.lat &&
+                markers[i].position.lng === position.lng) {
                 markers.splice(i, 1);
                 break;
             }
@@ -63,40 +59,48 @@ function LandingPage() {
             markers[i].markerObject.setMap(map);
         }
     }
-   
-     function addMarker(location, description, attractionName) {
+
+
+    function addMarkerAttraction(location, description, attractionName) {
         // Convert string location to JSON object.   
         const position = {
             lat: parseFloat(location.split(',')[0]),
-            lng: parseFloat(location.split(',')[1]),
+            lng: parseFloat(location.split(',')[1])
         };
         map.setCenter(position);
- 
+
+        description = attractionName.replace(/_/g, " ").toUpperCase().bold() + "\n" + description;
+        description += "\n";
+        description += `Read more about it here: "https://en.wikipedia.org/wiki/"` + attractionName;
+
+
+
         const infowindow = new google.maps.InfoWindow({
-        content: description,
-        maxWidth: 350
-    });
-        
+            content: description,
+            maxWidth: 350
+        });
+
         const markerObject = new google.maps.Marker({
             position: position,
         });
- 
+
         const marker = {
             position: position,
             title: attractionName,
             markerObject: markerObject,
         }
- 
+
         // Add new marker to the array.
         markers.push(marker);
         infowindows.push(infowindow);
- 
+
         // Update markers on map page.
         for (let i = 0; i < markers.length; i++) {
             markers[i].markerObject.setMap(map);
+            // eslint-disable-next-line
             markers[i].markerObject.addListener("click", () => {
-              infowindows[i].open(map, markers[i].markerObject);
-        });
+                infowindows[i].open(map, markers[i].markerObject);
+            });
         }
     }
 
@@ -126,8 +130,6 @@ function LandingPage() {
             markers[i].markerObject.setMap(map);
         }
     }
-    const [hiddenIn, setHiddenIn] = useState(false);
-    const [hiddenOut, setHiddenOut] = useState(true);
 
     function authentication() {
         fetch('/api/login')
@@ -165,7 +167,7 @@ function LandingPage() {
         script.type = "text/javascript";
 
         if (script.readyState) {
-            script.onreadystatechange = function () {
+            script.onreadystatechange = function() {
                 if (script.readyState === "loaded" || script.readyState === "complete") {
                     script.onreadystatechange = null;
                     calls();
@@ -231,7 +233,7 @@ function LandingPage() {
             url = 'locations=' + latStart + "," + longStart + "*" + localStorage["url"].split("=")[1];
             localStorage.setItem("url", url);
         }
-        if (latStart !== undefined && localStorage["url"] == undefined) {
+        if (latStart !== undefined && localStorage["url"] === undefined) {
             url = 'locations=' + latStart + "," + longStart;
             localStorage.setItem("url", url);
         }
@@ -259,26 +261,24 @@ function LandingPage() {
             '&key=' + key;
         fetch(url)
             .then(response => response.json())
-            .then(function (data) {
+            .then(function(data) {
                 const lat = data.results[0].geometry.location.lat;
                 const lng = data.results[0].geometry.location.lng;
                 const adress = '/api/attractions?lat=' + lat + '&long=' + lng;
                 fetch(adress)
                     .then(response => response.json())
-                    .then(function (attractions) {
-                        setTimeout(function () {
+                    .then(function(attractions) {
+                        setTimeout(function() {
                             const listatt = document.getElementById('attractionDiv');
-                            const listDiv = document.createElement('div');
-                            listDiv.className = 'row';
-                            listDiv.innerHTML = '';
+
+                            listatt.innerHTML = '';
                             attractions.results.sort((a, b) => {
                                 return b.user_ratings_total - a.user_ratings_total;
                             });
                             for (let i = 0; i < attractions.results.length; i++) {
-                                listDiv.appendChild(createListElem(attractions.results[i]));
+                                listatt.appendChild(createListElem(attractions.results[i]));
                             }
-                            listatt.innerHTML = '';
-                            listatt.appendChild(listDiv);
+
                         }
                             , 200);
                     }
@@ -294,15 +294,18 @@ function LandingPage() {
 
         const keyImg = Object.values(ImgKey)[0];
         let attrPhoto;
-        if (attraction.photos[0] === undefined) {
-            attrPhoto = '' + ' alt="no photo available"';
-        } else {
+        if (attraction.photos === undefined) {
+            attrPhoto = 'alt="no photo available"';
+        } else if (attraction.photos[0] === undefined) {
+            attrPhoto = 'alt="no photo available"';
+        }
+        else {
             attrPhoto = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg;
         }
         touristsview += '<img width="300" height="200" src=' + attrPhoto + '>' +
             '<br>' +
             '<strong id="rating">' + attraction.rating + '</strong>' +
-            '<span id="total_rating">' + '(' + attraction.user_ratings_total + ')' + '</span>' +
+            '<span id="total_rating">(' + attraction.user_ratings_total + ')</span>' +
             '<br>' +
             '<span id="name">' + attraction.name + '</span>' +
             '<br>';
@@ -330,8 +333,10 @@ function LandingPage() {
         }
 
         buttonAdd.addEventListener('click', () => {
-            if (buttonAdd.innerText == "ADD") {
+
+            if (buttonAdd.innerText === "ADD") {
                 let url = localStorage["url"];
+
                 //it should be something like locations=
                 if (url === undefined) {
                     url = 'locations=';
@@ -378,10 +383,10 @@ function LandingPage() {
 
         const keyImg = Object.values(ImgKey)[0];
 
-        touristsview += '<img width="300" height="200" src=' + 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
+        touristsview += '<img width="300" height="200" src=https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + attraction.photos[0].photo_reference + '&key=' + keyImg + '>' +
             '<br>' +
             '<strong id="rating">' + attraction.rating + '</strong>' +
-            '<span id="total_rating">' + '(' + attraction.user_ratings_total + ')' + '</span>' +
+            '<span id="total_rating">(' + attraction.user_ratings_total + ')</span>' +
             '<br>' +
             '<strong id="name">' + attraction.name + '</strong>' +
             '<br>';
@@ -399,11 +404,9 @@ function LandingPage() {
             const adress = "api/restaurants?lat=" + lat + "&long=" + lng;
             fetch(adress)
                 .then(response => response.json())
-                .then(function (data) {
+                .then(function(data) {
                     const listatt = document.getElementById('attractionDiv');
-                    const listDiv = document.createElement('div');
-                    listDiv.className = 'row';
-                    listDiv.innerHTML = '';
+
 
                     const removeButtonUp = document.createElement("button");
                     removeButtonUp.innerText = "Back";
@@ -412,13 +415,16 @@ function LandingPage() {
                     })
                     removeButtonUp.backgroundColor = "cadetblue";
 
-
+                    listatt.innerHTML = '';
+                    listatt.appendChild(removeButtonUp);
+                    listatt.innerHTML += "<br/>";
+                    listatt.innerHTML += "<br/>";
                     data.results.sort((a, b) => {
                         return b.user_ratings_total - a.user_ratings_total;
                     });
 
                     for (let i = 0; i < data.results.length; i++) {
-                        listDiv.appendChild(createRestaurantElem(data.results[i]));
+                        listatt.appendChild(createRestaurantElem(data.results[i]));
                     }
 
                     const removeButtonDown = document.createElement("button");
@@ -428,9 +434,8 @@ function LandingPage() {
                     })
                     removeButtonDown.backgroundColor = "cadetblue";
 
-                    listatt.innerHTML = '';
-                    listatt.appendChild(removeButtonUp);
-                    listatt.appendChild(listDiv);
+                    listatt.innerHTML += "<br/>";
+                    listatt.innerHTML += "<br/>";
                     listatt.appendChild(removeButtonDown);
                 })
 
@@ -456,7 +461,7 @@ function LandingPage() {
         }
 
         buttonAdd.addEventListener('click', () => {
-            if (buttonAdd.innerText == "ADD") {
+            if (buttonAdd.innerText === "ADD") {
                 liElement.style.backgroundColor = 'green';
                 url = localStorage["url"];
                 //it should be something like locations=
@@ -476,10 +481,11 @@ function LandingPage() {
                 let attractionName = buttonAdd.parentElement.children[5].innerText;
                 attractionName = attractionName.replace(/\s/g, "_");
 
+
                 fetch(`api/webscrapper?attractionName=${attractionName}`, {
                     method: 'GET'
                 }).then((response) => response.json())
-                    .then((description) => addMarker(location, description, attractionName))
+                    .then((description) => addMarkerAttraction(location, description, attractionName))
 
             }
             else {
@@ -530,27 +536,26 @@ function LandingPage() {
             '&key=' + key;
         fetch(url)
             .then(response => response.json())
-            .then(function (data) {
+            .then(function(data) {
                 const lat = data.results[0].geometry.location.lat;
                 const lng = data.results[0].geometry.location.lng;
                 const adress = '/api/attractions?lat=' + lat + '&long=' + lng;
                 fetch(adress)
                     .then(response => response.json())
-                    .then(function (attractions) {
-                        setTimeout(function () {
+                    .then(function(attractions) {
+                        setTimeout(function() {
                             const listatt = document.getElementById('attractionDiv');
-                            const listDiv = document.createElement('div');
-                            listDiv.className = 'row';
-                            listDiv.innerHTML = '';
+                            listatt.innerHTML = '';
                             attractions.results.sort((a, b) => {
                                 return b.user_ratings_total - a.user_ratings_total;
                             });
                             for (let i = 0; i < attractions.results.length; i++) {
-                                listDiv.appendChild(createListElem(attractions.results[i]));
+
+                                listatt.appendChild(createListElem(attractions.results[i]));
                             }
                             localStorage.removeItem("url");
-                            listatt.innerHTML = '';
-                            listatt.appendChild(listDiv);
+
+
                         }
                             , 200);
                     }
@@ -568,15 +573,11 @@ function LandingPage() {
             method: 'GET'
         }).then((response) => response.json())
             .then((trips) => {
-                let index = 0;
-
-                if (localStorage["index"] === undefined)
-                    localStorage.setItem("index", trips.length - 1);
 
                 // we get the buttons location
                 let buttonLocation = document.getElementById("saved");
                 // delete all the previous buttons
-                buttonLocation.innerHTML = "<p>Previous created trips</p>" + "<br/>" + "<br/>";
+                buttonLocation.innerHTML = "<p>Previous created trips</p> <br/> <br/>";
                 //we create the buttons
                 for (let i = 0; i < trips.length; i++) {
                     const button = document.createElement("button");
@@ -594,7 +595,7 @@ function LandingPage() {
                     const buttondel = document.createElement("button");
                     buttondel.innerText = "remove trip";
                     buttondel.id = trips[i].timestamp;
-                    buttondel.addEventListener("click", function () {
+                    buttondel.addEventListener("click", function() {
                         //we first delete the button with the url
                         const params = new URLSearchParams();
                         params.append("id", trips[i].id);
@@ -619,6 +620,61 @@ function LandingPage() {
 
     }
 
+    function callLoadDiv(currentUrl, name) {
+        localStorage.setItem("url", currentUrl);
+        localStorage.setItem("backupSearchValue", name);
+
+
+        searchValue = localStorage["backupSearchValue"];
+
+        markers = [];
+
+        searchValue.replace(/\s/g, '+');
+        const key = Object.values(SECRET_KEY)[0];
+        const url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + searchValue +
+            '&key=' + key;
+        fetch(url)
+            .then(response => response.json())
+            .then(function(data) {
+                const lat = data.results[0].geometry.location.lat;
+                const lng = data.results[0].geometry.location.lng;
+                const adress = '/api/attractions?lat=' + lat + '&long=' + lng;
+                fetch(adress)
+                    .then(response => response.json())
+                    .then(function(attractions) {
+                        setTimeout(function() {
+
+                            attractions.results.sort((a, b) => {
+                                return b.user_ratings_total - a.user_ratings_total;
+                            });
+                            for (let i = 0; i < attractions.results.length; i++) {
+                                const lat = attractions.results[i].geometry.location.lat;
+                                const lng = attractions.results[i].geometry.location.lng;
+                                let adr = lat + "," + lng;
+                                if (currentUrl.includes(adr) === true) {
+                                    let attractionName = attractions.results[i].name;
+                                    attractionName = attractionName.replace(/\s/g, "_");
+
+
+                                    fetch(`api/webscrapper?attractionName=${attractionName}`, {
+                                        method: 'GET'
+                                    }).then((response) => response.json())
+                                        .then((description) => addMarkerAttraction(adr, description, attractionName))
+                                }
+                            }
+
+                        }
+                            , 200);
+                    }
+                    );
+            })
+
+        revertCity();
+
+        document.getElementById('create').style.display = 'block';
+        document.getElementById('optionalForm').style.display = 'block';
+    }
+
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             submitcity();
@@ -636,14 +692,7 @@ function LandingPage() {
         // Convert to timestamp and set time at 12pm.
         const timestamp = new Date(year, month, day).getTime() / 1000 + 54000;
 
-        // Always put the date parameter just before the locations parameter.
-        let url = localStorage["url"];
-        if (url == undefined) {
-            url = "date=" + timestamp + "&";
-        } else {
-            url = "date=" + timestamp + "&" + url;
-        }
-        localStorage.setItem("url", url);
+        localStorage.setItem("date", timestamp);
     }
 
     return (
@@ -651,13 +700,13 @@ function LandingPage() {
             <nav className="navbar navbar-light bg-light static-top">
                 <div className="container">
                     <img src={require("./assets/img/logo.jpg")} alt="" className="img-fluid" style={{ height: '70px', width: '70px', animation: 'spin 2s infinite' }} />
-                    <a className="navbar-brand" href="#">GTravel</a>
+                    <button className="navbar-brand" >GTravel</button>
 
                     <div id="loginsection" style={{ display: 'block' }}>
-                        <a className="btn btn-primary" href="#" id='login'>Sign In</a>
+                        <button className="btn btn-primary" href="#" id='login'>Sign In</button>
                     </div>
                     <div id="logoutsection" style={{ display: 'none' }}>
-                        <a className="btn btn-primary" href="#" id='logout'>Sign Out</a>
+                        <button className="btn btn-primary" href="#" id='logout'>Sign Out</button>
                     </div>
                 </div>
             </nav>
@@ -672,7 +721,7 @@ function LandingPage() {
                         <div className="col-md-10 col-lg-8 col-xl-7 mx-auto">
                             <div className="form-row">
                                 <div className="col-12 col-md-9 mb-2 mb-md-0">
-                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..." onKeyPress={handleKeyPress}/>
+                                    <input type="text" id="searchbox" className="form-control form-control-lg" placeholder="Enter a destination..." onKeyPress={handleKeyPress} />
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <button type="submit" id="submit_button" className="btn btn-block btn-lg btn-primary" onClick={submitcity}>Search!</button>
@@ -687,10 +736,69 @@ function LandingPage() {
 
             <section>
                 <p>Create a brand new itinerary by selecting what attractions you would like to visit, after searching the desired city</p>
-                 <div className="row">
+                <div className="row">
                     <div className="col-lg-8">
                         <div id="attractionDiv">
- 
+                            <ul>
+
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/munich.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Munich</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=48.1376098,11.5799253*48.17546460000001,11.551797*48.1298707,11.5834522*48.1768304,11.5590966*48.1582675,11.5033143*48.1364483,11.5784741", "Munich")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/moscow.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Moscow</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=55.75393030000001,37.620795*55.75202329999999,37.6174994*55.7446375,37.6054939*55.76013349999999,37.6186486*55.74730539999999,37.6051125*55.7621915,37.6225439", "Moscow")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/bucharest.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Bucharest</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=44.4078713,26.105064*44.4531131,26.0846382*44.4411651,26.0971299*44.4045728,26.1152452*44.43936679999999,26.09587400000001*44.4104938,26.1124879", "Bucharest")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/istanbul.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Istanbul</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=41.01650009999999,28.9705194*41.02566780000001,28.97412869999999*41.0115195,28.98337889999999*41.008583,28.980175*41.0054096,28.9768138*41.0080365,28.9767431", "Istanbul")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/rome.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Rome</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=41.8914252,12.5152192*41.87351719999999,12.5015034*41.8993212,12.4767522*41.9044205,12.4944377*41.9045479,12.479361*41.906361,12.489744", "Rome")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/newyork.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">New York</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=40.7579747,-73.9855426*40.7587402,-73.9786736*40.703141,-74.0159996*40.7614327,-73.97762159999999*40.6953752,-73.99968439999999*40.757498,-73.986654", "New York")}>View Trip</button>
+                                </li>
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/london.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">London</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=51.503324,-0.119543*51.5194133,-0.1269566*51.50811239999999,-0.0759493*51.5230174,-0.1543613*51.4978095,-0.1745235*51.5114838,-0.1323114", "London")}>View Trip</button>
+                                </li>
+
+                                <li id="trip">
+                                    <img width="300" height="200" src={require("./assets/img/paris.jpg")} alt=""></img>
+                                    <br></br>
+                                    <strong id="name">Paris</strong>
+                                    <br></br>
+                                    <button onClick={() => callLoadDiv("locations=48.85837009999999,2.2944813*48.8606111,2.337644*48.88670459999999,2.3431043*48.8599614,2.3265614*48.85296820000001,2.3499021*48.86401059999999,2.3059374", "Paris")}>View Trip</button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div className="col-lg-4">
@@ -717,72 +825,7 @@ function LandingPage() {
                     <input type="text" id="tripName" className="form-control form-control-lg" placeholder="Enter the trip name..." required />
                 </div>
 
-
                 <br />
-
-                <div style={{ width: 1000, height: 1000, float: 'left', left: 0, border: '1px solid black' }} id="predefined-trips">
-                    <ul>
-
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/munich.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Munich</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=48.1376098,11.5799253*48.17546460000001,11.551797*48.1298707,11.5834522*48.1768304,11.5590966*48.1582675,11.5033143*48.1364483,11.5784741")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/moscow.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Moscow</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=55.75393030000001,37.620795*55.75202329999999,37.6174994*55.7446375,37.6054939*55.76013349999999,37.6186486*55.74730539999999,37.6051125*55.7621915,37.6225439")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/bucharest.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Bucharest</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=44.4078713,26.105064*44.4531131,26.0846382*44.4411651,26.0971299*44.4045728,26.1152452*44.43936679999999,26.09587400000001*44.4104938,26.1124879")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/istanbul.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Istanbul</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=41.01650009999999,28.9705194*41.02566780000001,28.97412869999999*41.0115195,28.98337889999999*41.008583,28.980175*41.0054096,28.9768138*41.0080365,28.9767431")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/rome.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Rome</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=41.8914252,12.5152192*41.87351719999999,12.5015034*41.8993212,12.4767522*41.9044205,12.4944377*41.9045479,12.479361*41.906361,12.489744")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/newyork.jpg")}></img>
-                            <br></br>
-                            <strong id="name">New York</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=40.7579747,-73.9855426*40.7587402,-73.9786736*40.703141,-74.0159996*40.7614327,-73.97762159999999*40.6953752,-73.99968439999999*40.757498,-73.986654")}>View Trip</button>
-                        </li>
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/london.jpg")}></img>
-                            <br></br>
-                            <strong id="name">London</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=51.503324,-0.119543*51.5194133,-0.1269566*51.50811239999999,-0.0759493*51.5230174,-0.1543613*51.4978095,-0.1745235*51.5114838,-0.1323114")}>View Trip</button>
-                        </li>
-
-                        <li id="trip">
-                            <img width="300" height="200" src={require("./assets/img/paris.jpg")}></img>
-                            <br></br>
-                            <strong id="name">Paris</strong>
-                            <br></br>
-                            <button onClick={() => callLoad("locations=48.85837009999999,2.2944813*48.8606111,2.337644*48.88670459999999,2.3431043*48.8599614,2.3265614*48.85296820000001,2.3499021*48.86401059999999,2.3059374")}>View Trip</button>
-                        </li>
-                    </ul>
-                </div>
-                <div style={{ width: 1000, height: 1000, float: 'right', position: 'absolute', right: 0 }} id="map"></div>
 
                 <div class="ofb">
                     <Link to="/map">
@@ -887,19 +930,19 @@ function LandingPage() {
                         <div className="col-lg-6 h-100 text-center text-lg-left my-auto">
                             <ul className="list-inline mb-2">
                                 <li className="list-inline-item">
-                                    <a href="#">About</a>
+                                    <button >About</button>
                                 </li>
                                 <li className="list-inline-item">&sdot;</li>
                                 <li className="list-inline-item">
-                                    <a href="#">Contact</a>
+                                    <button >Contact</button>
                                 </li>
                                 <li className="list-inline-item">&sdot;</li>
                                 <li className="list-inline-item">
-                                    <a href="#">Create an itinerary</a>
+                                    <button href="#">Create an itinerary</button>
                                 </li>
                                 <li className="list-inline-item">&sdot;</li>
                                 <li className="list-inline-item">
-                                    <a href="#saved" onClick={getSavedItinerary}>My Trips</a>
+                                    <button href="#saved" onClick={getSavedItinerary}>My Trips</button>
                                 </li>
                             </ul>
                             <p className="text-muted small mb-4 mb-lg-0">&copy; GTravel 2020</p>
@@ -907,19 +950,19 @@ function LandingPage() {
                         <div className="col-lg-6 h-100 text-center text-lg-right my-auto">
                             <ul className="list-inline mb-0">
                                 <li className="list-inline-item mr-3">
-                                    <a href="#">
+                                    <button href="#">
                                         <i className="fa fa-facebook fa-2x fa-fw"></i>
-                                    </a>
+                                    </button>
                                 </li>
                                 <li className="list-inline-item mr-3">
-                                    <a href="#">
+                                    <button href="#">
                                         <i className="fa fa-twitter-square fa-2x fa-fw"></i>
-                                    </a>
+                                    </button>
                                 </li>
                                 <li className="list-inline-item">
-                                    <a href="#">
+                                    <button href="#">
                                         <i className="fa fa-instagram fa-2x fa-fw"></i>
-                                    </a>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
