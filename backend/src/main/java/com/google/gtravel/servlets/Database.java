@@ -78,10 +78,10 @@ public class Database extends HttpServlet {
     String tripID = request.getParameter("tripID");
     String tripName = request.getParameter("tripName");
 
-    //make a query to check if the trip is already in the database 
+    // make a query to check if the trip is already in the database 
     Query query = new Query("Trip");
 
-    //adding the filters
+    // adding the filters
     List<Filter> filterList = new ArrayList<>();
     filterList.add(Query.FilterOperator.EQUAL.of("userID", userID));
     filterList.add(Query.FilterOperator.EQUAL.of("tripID", tripID));
@@ -89,10 +89,10 @@ public class Database extends HttpServlet {
     Filter filter = Query.CompositeFilterOperator.and(filterList);
     query.setFilter(filter);
 
-    //gettin the results
+    // gettin the results
     PreparedQuery results = datastore.prepare(query);
     if (results.countEntities() > 0) {
-      //return that it is already saved
+      // return that it is already saved
       response.setContentType("application/json");
       Gson gson = new Gson();
       String responseStr = "trip already saved";
