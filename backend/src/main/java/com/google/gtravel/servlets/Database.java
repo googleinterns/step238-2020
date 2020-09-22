@@ -78,7 +78,7 @@ public class Database extends HttpServlet {
     String tripID = request.getParameter("tripID");
     String tripName = request.getParameter("tripName");
 
-    // make a query to check if the trip is already in the database 
+    // make a query to check if the trip is already in the database
     Query query = new Query("Trip");
 
     // adding the filters
