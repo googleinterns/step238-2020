@@ -19,10 +19,12 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.gson.Gson;
 import com.google.gtravel.data.Trip;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,24 +68,52 @@ public class Database extends HttpServlet {
   // Add new trip.
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    response.setContentType("text/html;");
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     // Take POST parameters to adding new entity.
     String userID = request.getParameter("userID");
     String tripID = request.getParameter("tripID");
     String tripName = request.getParameter("tripName");
-    long timestamp = System.currentTimeMillis();
 
-    Entity tripEntity = new Entity("Trip");
+    // make a query to check if the trip is already in the database
+    Query query = new Query("Trip");
 
-    // Set new entitys properties.
-    tripEntity.setProperty("userID", userID);
-    tripEntity.setProperty("tripID", tripID);
-    tripEntity.setProperty("tripName", tripName);
-    tripEntity.setProperty("timestamp", timestamp);
+    // adding the filters
+    List<Filter> filterList = new ArrayList<>();
+    filterList.add(Query.FilterOperator.EQUAL.of("userID", userID));
+    filterList.add(Query.FilterOperator.EQUAL.of("tripID", tripID));
+    filterList.add(Query.FilterOperator.EQUAL.of("tripName", tripName));
+    Filter filter = Query.CompositeFilterOperator.and(filterList);
+    query.setFilter(filter);
 
-    // Add entity.
-    datastore.put(tripEntity);
-    response.sendRedirect("/");
+    // gettin the results
+    PreparedQuery results = datastore.prepare(query);
+    if (results.countEntities() > 0) {
+      // return that it is already saved
+      response.setContentType("application/json");
+      Gson gson = new Gson();
+      String responseStr = "trip already saved";
+      response.getWriter().println(gson.toJson(responseStr));
+    } else {
+      long timestamp = System.currentTimeMillis();
+
+      Entity tripEntity = new Entity("Trip");
+
+      // Set new entitys properties.
+      tripEntity.setProperty("userID", userID);
+      tripEntity.setProperty("tripID", tripID);
+      tripEntity.setProperty("tripName", tripName);
+      tripEntity.setProperty("timestamp", timestamp);
+
+      // Add entity.
+      datastore.put(tripEntity);
+      response.setContentType("application/json");
+      Gson gson = new Gson();
+      String responseStr = "trip saved successfully";
+      response.getWriter().println(gson.toJson(responseStr));
+    }
   }
 }
