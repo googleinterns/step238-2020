@@ -331,12 +331,12 @@ function LandingPage() {
             liElement.style.backgroundColor = '';
             buttonAdd.innerText = 'ADD';
         }
-
-        buttonAdd.addEventListener('click', () => {
-
+        console.log("before");
+        buttonAdd.addEventListener('mousedown', () => {
+            console.log("in");
             if (buttonAdd.innerText === "ADD") {
                 let url = localStorage["url"];
-
+                console.log("if");
                 //it should be something like locations=
                 if (url === undefined) {
                     url = 'locations=';
@@ -413,19 +413,21 @@ function LandingPage() {
                     removeButtonUp.addEventListener("click", () => {
                         revertCity();
                     })
+                    
                     removeButtonUp.backgroundColor = "cadetblue";
 
                     listatt.innerHTML = '';
-                    listatt.appendChild(removeButtonUp);
+                    
                     listatt.innerHTML += "<br/>";
                     listatt.innerHTML += "<br/>";
                     data.results.sort((a, b) => {
                         return b.user_ratings_total - a.user_ratings_total;
                     });
 
-                    for (let i = 0; i < data.results.length; i++) {
+                    setTimeout(function()
+                    {for (let i = 0; i < data.results.length; i++) {
                         listatt.appendChild(createRestaurantElem(data.results[i]));
-                    }
+                    }}, 300);
 
                     const removeButtonDown = document.createElement("button");
                     removeButtonDown.innerText = "Back";
@@ -437,6 +439,7 @@ function LandingPage() {
                     listatt.innerHTML += "<br/>";
                     listatt.innerHTML += "<br/>";
                     listatt.appendChild(removeButtonDown);
+                    listatt.prepend(removeButtonUp);
                 })
 
         })
